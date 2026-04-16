@@ -1,0 +1,169 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 40 18% 96%;
+    --foreground: 30 10% 12%;
+
+    --card: 38 16% 95%;
+    --card-foreground: 30 10% 12%;
+
+    --popover: 40 18% 96%;
+    --popover-foreground: 30 10% 12%;
+
+    --primary: 34 42% 42%;
+    --primary-foreground: 40 20% 97%;
+
+    --secondary: 38 12% 92%;
+    --secondary-foreground: 30 10% 12%;
+
+    --muted: 36 8% 88%;
+    --muted-foreground: 30 8% 46%;
+
+    --accent: 34 42% 42%;
+    --accent-foreground: 40 20% 97%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 36 10% 86%;
+    --input: 36 10% 86%;
+    --ring: 34 42% 42%;
+
+    --radius: 0.5rem;
+
+    --gold: 34 42% 42%;
+    --gold-light: 34 38% 56%;
+    --gold-dark: 30 50% 28%;
+    --cream: 40 22% 96%;
+    --cream-dark: 36 14% 78%;
+    --charcoal: 30 10% 12%;
+    --charcoal-light: 30 8% 24%;
+    --olive: 38 28% 26%;
+    --olive-light: 36 20% 36%;
+
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-body: 'DM Sans', system-ui, sans-serif;
+
+    --sidebar-background: 38 14% 94%;
+    --sidebar-foreground: 30 10% 12%;
+    --sidebar-primary: 34 42% 42%;
+    --sidebar-primary-foreground: 40 20% 97%;
+    --sidebar-accent: 36 8% 88%;
+    --sidebar-accent-foreground: 30 10% 12%;
+    --sidebar-border: 36 10% 86%;
+    --sidebar-ring: 34 42% 42%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-body);
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+  }
+
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--gold) / 0.2);
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--gold) / 0.4);
+  }
+}
+
+@layer components {
+  .gold-divider {
+    @apply w-16 h-px mx-auto;
+    background: linear-gradient(90deg, transparent, hsl(var(--gold)), transparent);
+  }
+  .gold-divider-left {
+    @apply w-12 h-px;
+    background: linear-gradient(90deg, hsl(var(--gold)), transparent);
+  }
+  .section-padding {
+    @apply px-5 py-14 md:px-12 md:py-20 lg:px-24;
+  }
+  .glass-card {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+  }
+  .glass-nav {
+    background: hsl(var(--background) / 0.92);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-bottom: 1px solid hsl(var(--border) / 0.5);
+  }
+  .text-gold-gradient {
+    background: linear-gradient(135deg, hsl(var(--gold-light)), hsl(var(--gold)), hsl(var(--gold-dark)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hover-gold-border {
+    @apply transition-all duration-300;
+  }
+  .hover-gold-border:hover {
+    border-color: hsl(var(--gold) / 0.4);
+    box-shadow: 0 2px 20px hsl(var(--gold) / 0.06);
+  }
+  .luxury-shadow {
+    box-shadow: 0 4px 30px hsl(30 10% 12% / 0.06);
+  }
+}
+
+@layer utilities {
+  .animate-fade-up {
+    animation: fadeUp 0.7s ease-out forwards;
+  }
+  .animate-fade-in {
+    animation: fadeIn 0.8s ease-out forwards;
+  }
+  .gpu-accelerated {
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    will-change: transform;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

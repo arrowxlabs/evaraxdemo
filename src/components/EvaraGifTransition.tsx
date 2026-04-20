@@ -52,8 +52,8 @@ const EvaraGifTransition = ({ isActive, onMidpoint, onComplete }: EvaraGifTransi
     const video = videoRef.current;
     if (!video) return;
 
-    // Speed up playback ~1.3× for a snappier feel
-    video.playbackRate = 1.3;
+    // Original speed for natural smooth playback
+    video.playbackRate = 1.0;
     video.currentTime = 0;
 
     const playPromise = video.play();
@@ -111,9 +111,14 @@ const EvaraGifTransition = ({ isActive, onMidpoint, onComplete }: EvaraGifTransi
       {isActive && (
         <motion.div
           className="fixed inset-0 z-[9999] overflow-hidden"
-          // Warm cream base — eliminates the brief black flash before video paints
-          style={{ backgroundColor: "hsl(38 45% 94%)" }}
-          initial={{ opacity: 0 }}
+          // Use the poster as immediate backdrop — zero black flash before first video frame
+          style={{
+            backgroundColor: "hsl(38 45% 94%)",
+            backgroundImage: "url(/transitions/evara-transition-poster.jpg)",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+          initial={{ opacity: 1 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
@@ -161,8 +166,9 @@ const EvaraGifTransition = ({ isActive, onMidpoint, onComplete }: EvaraGifTransi
                 transition={{ duration: 1.05, times: [0, 0.18, 0.5, 0.75, 1], ease: "easeOut" }}
                 style={{
                   background:
-                    "radial-gradient(circle at center, hsl(45 95% 92% / 1) 0%, hsl(42 90% 78% / 0.95) 30%, hsl(40 85% 65% / 0.55) 60%, hsl(38 80% 55% / 0) 100%)",
-                  mixBlendMode: "screen",
+                    "radial-gradient(circle at center, rgba(255,255,255,1) 0%, rgba(255,253,248,0.95) 35%, rgba(255,250,240,0.7) 65%, rgba(255,255,255,0) 100%)",
+                  backdropFilter: "blur(6px)",
+                  WebkitBackdropFilter: "blur(6px)",
                 }}
               />
             )}

@@ -1,61 +1,92 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Volume2, VolumeX } from "lucide-react";
 
 interface EvaraGifTransitionProps {
   isActive: boolean;
-  onMidpoint: () => void; // navigate to hotel page (called early so page can mount)
-  onComplete: () => void; // teardown after fade
+  onMidpoint: () => void;
+  onComplete: () => void;
 }
+
+const MUTE_KEY = "evara-transition-muted";
 
 /**
  * Cinematic parallax transition for Hotel Evara.
- * - Plays a high-quality MP4/WebM (converted from the source GIF for buttery playback)
- * - Subtle parallax: slow zoom + vertical drift while video plays
- * - Navigates to hotel page mid-playback so it's fully loaded before reveal
- * - Ends with a white glow flash that fades to reveal the new page
+ * - Warm cream backdrop (no black flash on mount)
+ * - Faster playback (1.3×) with parallax zoom + drift
+ * - Gold-tinted glow that's stronger and longer
+ * - Soft chime/whoosh audio cue with persistent mute toggle
+ * - Navigates ~700ms before end so the hotel page is fully ready
  */
 const EvaraGifTransition = ({ isActive, onMidpoint, onComplete }: EvaraGifTransitionProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
   const [showFlash, setShowFlash] = useState(false);
+  const [muted, setMuted] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return window.localStorage.getItem(MUTE_KEY) === "1";
+  });
   const navigatedRef = useRef(false);
   const completedRef = useRef(false);
+
+  // Persist mute preference + apply live
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(MUTE_KEY, muted ? "1" : "0");
+    }
+    if (audioRef.current) audioRef.current.muted = muted;
+  }, [muted]);
 
   useEffect(() => {
     if (!isActive) {
       navigatedRef.current = false;
       completedRef.current = false;
       setShowFlash(false);
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
       return;
     }
 
     const video = videoRef.current;
     if (!video) return;
 
-    // Force play (autoplay can be blocked without muted+playsInline, both set below)
+    // Speed up playback ~1.3× for a snappier feel
+    video.playbackRate = 1.3;
+    video.currentTime = 0;
+
     const playPromise = video.play();
     if (playPromise) playPromise.catch(() => {});
 
+    // Audio cue (best effort — autoplay policy permits muted, and we already had a user click)
+    const audio = audioRef.current;
+    if (audio) {
+      audio.currentTime = 0;
+      audio.muted = muted;
+      audio.volume = 0.6;
+      audio.play().catch(() => {});
+    }
+
     const handleTimeUpdate = () => {
       if (!video.duration) return;
-      const remaining = video.duration - video.currentTime;
+      const remaining = (video.duration - video.currentTime) / (video.playbackRate || 1);
 
-      // ~600ms before end: navigate so the next page mounts behind the overlay
-      if (!navigatedRef.current && remaining <= 0.7) {
+      // Navigate well before end so the hotel page is mounted behind the overlay
+      if (!navigatedRef.current && remaining <= 0.9) {
         navigatedRef.current = true;
         onMidpoint();
       }
 
-      // ~250ms before end: trigger the white-glow fade
-      if (!completedRef.current && remaining <= 0.3) {
+      // Trigger gold glow earlier for a longer, gentler fade
+      if (!completedRef.current && remaining <= 0.55) {
         completedRef.current = true;
         setShowFlash(true);
-        // Allow flash + fade to play out, then tear down overlay
-        window.setTimeout(() => onComplete(), 700);
+        window.setTimeout(() => onComplete(), 1100);
       }
     };
 
     const handleEnded = () => {
-      // Safety net in case timeupdate didn't fire late frames
       if (!navigatedRef.current) {
         navigatedRef.current = true;
         onMidpoint();
@@ -63,7 +94,7 @@ const EvaraGifTransition = ({ isActive, onMidpoint, onComplete }: EvaraGifTransi
       if (!completedRef.current) {
         completedRef.current = true;
         setShowFlash(true);
-        window.setTimeout(() => onComplete(), 600);
+        window.setTimeout(() => onComplete(), 1000);
       }
     };
 
@@ -73,24 +104,26 @@ const EvaraGifTransition = ({ isActive, onMidpoint, onComplete }: EvaraGifTransi
       video.removeEventListener("timeupdate", handleTimeUpdate);
       video.removeEventListener("ended", handleEnded);
     };
-  }, [isActive, onMidpoint, onComplete]);
+  }, [isActive, onMidpoint, onComplete, muted]);
 
   return (
     <AnimatePresence>
       {isActive && (
         <motion.div
-          className="fixed inset-0 z-[9999] overflow-hidden bg-black"
+          className="fixed inset-0 z-[9999] overflow-hidden"
+          // Warm cream base — eliminates the brief black flash before video paints
+          style={{ backgroundColor: "hsl(38 45% 94%)" }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+          transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
         >
-          {/* Parallax video layer: slow zoom + subtle drift */}
+          {/* Parallax video layer */}
           <motion.div
             className="absolute inset-0 will-change-transform"
             initial={{ scale: 1.08, y: "-2%" }}
-            animate={{ scale: 1.18, y: "2%" }}
-            transition={{ duration: 8, ease: "linear" }}
+            animate={{ scale: 1.2, y: "2%" }}
+            transition={{ duration: 6, ease: "linear" }}
           >
             <video
               ref={videoRef}
@@ -102,36 +135,58 @@ const EvaraGifTransition = ({ isActive, onMidpoint, onComplete }: EvaraGifTransi
               poster="/transitions/evara-transition-poster.jpg"
               {...({ "webkit-playsinline": "true" } as Record<string, string>)}
               disableRemotePlayback
+              style={{ backgroundColor: "hsl(38 45% 94%)" }}
             >
-              <source src="/transitions/evara-transition.webm" type="video/webm" />
-              <source src="/transitions/evara-transition.mp4" type="video/mp4" />
+              <source src="/transitions/evara-transition-fast.webm" type="video/webm" />
+              <source src="/transitions/evara-transition-fast.mp4" type="video/mp4" />
             </video>
           </motion.div>
 
-          {/* Vignette for depth */}
+          {/* Soft vignette for depth */}
           <div
             className="pointer-events-none absolute inset-0"
             style={{
               background:
-                "radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.45) 100%)",
+                "radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.35) 100%)",
             }}
           />
 
-          {/* White glow flash + fade-out reveal */}
+          {/* Gold-tinted glow flash + extended fade */}
           <AnimatePresence>
             {showFlash && (
               <motion.div
                 className="absolute inset-0 pointer-events-none"
                 initial={{ opacity: 0 }}
-                animate={{ opacity: [0, 1, 1, 0] }}
-                transition={{ duration: 0.65, times: [0, 0.25, 0.55, 1], ease: "easeOut" }}
+                animate={{ opacity: [0, 1, 1, 0.85, 0] }}
+                transition={{ duration: 1.05, times: [0, 0.18, 0.5, 0.75, 1], ease: "easeOut" }}
                 style={{
                   background:
-                    "radial-gradient(circle at center, rgba(255,253,245,1) 0%, rgba(255,250,235,0.95) 35%, rgba(255,245,220,0.6) 70%, rgba(255,255,255,0) 100%)",
+                    "radial-gradient(circle at center, hsl(45 95% 92% / 1) 0%, hsl(42 90% 78% / 0.95) 30%, hsl(40 85% 65% / 0.55) 60%, hsl(38 80% 55% / 0) 100%)",
+                  mixBlendMode: "screen",
                 }}
               />
             )}
           </AnimatePresence>
+
+          {/* Audio + mute toggle */}
+          <audio ref={audioRef} preload="auto">
+            <source src="/transitions/evara-chime.webm" type="audio/webm" />
+            <source src="/transitions/evara-chime.m4a" type="audio/mp4" />
+          </audio>
+
+          <button
+            type="button"
+            onClick={() => setMuted((m) => !m)}
+            aria-label={muted ? "Unmute transition sound" : "Mute transition sound"}
+            className="absolute top-5 right-5 md:top-6 md:right-6 z-[10000] rounded-full p-2.5 backdrop-blur-md transition-all hover:scale-105 active:scale-95"
+            style={{
+              backgroundColor: "hsl(0 0% 100% / 0.18)",
+              border: "1px solid hsl(0 0% 100% / 0.35)",
+              color: "hsl(45 90% 95%)",
+            }}
+          >
+            {muted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+          </button>
         </motion.div>
       )}
     </AnimatePresence>

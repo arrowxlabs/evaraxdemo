@@ -100,8 +100,7 @@ const EvaraGifTransition = ({ isActive, onMidpoint, onComplete }: EvaraGifTransi
               playsInline
               preload="auto"
               poster="/transitions/evara-transition-poster.jpg"
-              // @ts-expect-error - non-standard but improves iOS behavior
-              webkit-playsinline="true"
+              {...({ "webkit-playsinline": "true" } as Record<string, string>)}
               disableRemotePlayback
             >
               <source src="/transitions/evara-transition.webm" type="video/webm" />

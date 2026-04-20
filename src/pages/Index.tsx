@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { hotels } from "@/data/hotels";
 import { Phone, Mail, Instagram, Menu, X, ArrowRight } from "lucide-react";
 import HotelZoomTransition from "@/components/HotelZoomTransition";
+import EvaraGifTransition from "@/components/EvaraGifTransition";
 
 // Staggered card component with scroll-triggered animation
 const HotelCard = ({ hotel, index, onClickHotel }: { hotel: typeof hotels[0]; index: number; onClickHotel: (hotel: typeof hotels[0], rect: DOMRect) => void }) => {
@@ -76,6 +77,18 @@ const Index = () => {
   const [zoomRect, setZoomRect] = useState<DOMRect | null>(null);
   const [pendingPath, setPendingPath] = useState<string | null>(null);
 
+  // Evara-only cinematic GIF/video transition
+  const [evaraTransitionActive, setEvaraTransitionActive] = useState(false);
+
+  // Preload the transition video once so playback is instant on click
+  useEffect(() => {
+    const v = document.createElement("video");
+    v.preload = "auto";
+    v.muted = true;
+    v.src = "/transitions/evara-transition.mp4";
+    v.load();
+  }, []);
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -106,9 +119,29 @@ const Index = () => {
 
   const handleClickHotel = useCallback((hotel: typeof hotels[0], rect: DOMRect) => {
     setPendingPath(`/hotel/${hotel.id}`);
+
+    // Hotel Evara → cinematic parallax video transition (replaces old zoom)
+    if (hotel.id === "evara") {
+      setEvaraTransitionActive(true);
+      return;
+    }
+
+    // All other hotels keep the existing zoom transition
     setZoomImage(hotel.cardImage);
     setZoomRect(rect);
     setZoomActive(true);
+  }, []);
+
+  const handleEvaraMidpoint = useCallback(() => {
+    if (pendingPath) {
+      navigate(pendingPath);
+      window.scrollTo(0, 0);
+    }
+  }, [navigate, pendingPath]);
+
+  const handleEvaraComplete = useCallback(() => {
+    setEvaraTransitionActive(false);
+    setPendingPath(null);
   }, []);
 
   const handleZoomMidpoint = useCallback(() => {
@@ -133,6 +166,12 @@ const Index = () => {
         cardRect={zoomRect}
         onMidpoint={handleZoomMidpoint}
         onComplete={handleZoomComplete}
+      />
+
+      <EvaraGifTransition
+        isActive={evaraTransitionActive}
+        onMidpoint={handleEvaraMidpoint}
+        onComplete={handleEvaraComplete}
       />
 
       {/* ===== INTRO LOADER ===== */}

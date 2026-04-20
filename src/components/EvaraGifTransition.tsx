@@ -174,6 +174,73 @@ const EvaraGifTransition = ({ isActive, onMidpoint, onComplete }: EvaraGifTransi
             )}
           </AnimatePresence>
 
+          {/* EVARA monogram + shimmer — appears inside the white fog right before reveal */}
+          <AnimatePresence>
+            {showFlash && (
+              <motion.div
+                className="absolute inset-0 pointer-events-none flex items-center justify-center"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [0, 0, 1, 1, 0] }}
+                transition={{ duration: 1.05, times: [0, 0.25, 0.45, 0.75, 1], ease: "easeOut" }}
+              >
+                <div className="relative flex flex-col items-center gap-2">
+                  {/* Top hairline */}
+                  <motion.div
+                    className="h-px"
+                    style={{ background: "linear-gradient(90deg, transparent, hsl(40 70% 45% / 0.7), transparent)" }}
+                    initial={{ width: 0 }}
+                    animate={{ width: 90 }}
+                    transition={{ duration: 0.5, delay: 0.25, ease: "easeOut" }}
+                  />
+
+                  {/* Monogram letters */}
+                  <div className="relative flex items-center gap-[0.18em] px-2">
+                    {"EVARA".split("").map((letter, i) => (
+                      <motion.span
+                        key={i}
+                        style={{
+                          fontFamily: "var(--font-display)",
+                          fontSize: "clamp(1.1rem, 3.2vw, 1.6rem)",
+                          fontWeight: 300,
+                          letterSpacing: "0.4em",
+                          color: "hsl(40 65% 38%)",
+                          textShadow: "0 0 18px hsl(45 90% 80% / 0.9)",
+                        }}
+                        initial={{ opacity: 0, y: 6, filter: "blur(4px)" }}
+                        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                        transition={{ duration: 0.45, delay: 0.3 + i * 0.05, ease: [0.25, 0.1, 0.25, 1] }}
+                      >
+                        {letter}
+                      </motion.span>
+                    ))}
+
+                    {/* Shimmer sweep over the letters */}
+                    <motion.div
+                      className="absolute inset-0 pointer-events-none"
+                      initial={{ x: "-110%", opacity: 0 }}
+                      animate={{ x: "110%", opacity: [0, 1, 0] }}
+                      transition={{ duration: 0.7, delay: 0.45, ease: "easeInOut" }}
+                      style={{
+                        background:
+                          "linear-gradient(100deg, transparent 30%, hsl(45 100% 95% / 0.95) 50%, transparent 70%)",
+                        mixBlendMode: "screen",
+                      }}
+                    />
+                  </div>
+
+                  {/* Bottom hairline */}
+                  <motion.div
+                    className="h-px"
+                    style={{ background: "linear-gradient(90deg, transparent, hsl(40 70% 45% / 0.7), transparent)" }}
+                    initial={{ width: 0 }}
+                    animate={{ width: 90 }}
+                    transition={{ duration: 0.5, delay: 0.25, ease: "easeOut" }}
+                  />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* Audio + mute toggle */}
           <audio ref={audioRef} preload="auto">
             <source src="/transitions/evara-chime.webm" type="audio/webm" />

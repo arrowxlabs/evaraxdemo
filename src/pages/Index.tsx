@@ -85,8 +85,10 @@ const Index = () => {
     const v = document.createElement("video");
     v.preload = "auto";
     v.muted = true;
-    v.src = "/transitions/evara-transition.mp4";
+    v.src = "/transitions/evara-transition-fast.mp4";
     v.load();
+    const a = new Audio("/transitions/evara-chime.m4a");
+    a.preload = "auto";
   }, []);
 
   useEffect(() => {

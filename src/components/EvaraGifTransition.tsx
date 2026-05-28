@@ -181,34 +181,45 @@ const EvaraGifTransition = ({ isActive, onMidpoint, onComplete }: EvaraGifTransi
                 className="absolute inset-0 pointer-events-none flex items-center justify-center"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: [0, 0, 1, 1, 0] }}
-                transition={{ duration: 1.05, times: [0, 0.25, 0.45, 0.75, 1], ease: "easeOut" }}
+                transition={{ duration: 1.15, times: [0, 0.22, 0.42, 0.74, 1], ease: "easeOut" }}
               >
-                <div className="relative flex flex-col items-center gap-2">
-                  {/* Top hairline */}
+                <div className="relative flex flex-col items-center gap-3 md:gap-4">
+                  {/* Top hairline with a small diamond at center */}
                   <motion.div
-                    className="h-px"
-                    style={{ background: "linear-gradient(90deg, transparent, hsl(40 70% 45% / 0.7), transparent)" }}
-                    initial={{ width: 0 }}
-                    animate={{ width: 90 }}
-                    transition={{ duration: 0.5, delay: 0.25, ease: "easeOut" }}
-                  />
+                    className="relative flex items-center justify-center"
+                    initial={{ width: 0, opacity: 0 }}
+                    animate={{ width: 220, opacity: 1 }}
+                    transition={{ duration: 0.55, delay: 0.22, ease: "easeOut" }}
+                  >
+                    <div
+                      className="h-px w-full"
+                      style={{ background: "linear-gradient(90deg, transparent, hsl(40 70% 45% / 0.75), transparent)" }}
+                    />
+                    <motion.div
+                      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rotate-45"
+                      style={{ width: 7, height: 7, border: "1px solid hsl(40 70% 45% / 0.85)", background: "hsl(45 90% 88% / 0.5)" }}
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.4, delay: 0.42, ease: [0.34, 1.56, 0.64, 1] }}
+                    />
+                  </motion.div>
 
-                  {/* Monogram letters */}
+                  {/* Monogram letters — larger luxury mark */}
                   <div className="relative flex items-center gap-[0.18em] px-2">
                     {"EVARA".split("").map((letter, i) => (
                       <motion.span
                         key={i}
                         style={{
                           fontFamily: "var(--font-display)",
-                          fontSize: "clamp(1.1rem, 3.2vw, 1.6rem)",
+                          fontSize: "clamp(1.8rem, 6vw, 3rem)",
                           fontWeight: 300,
-                          letterSpacing: "0.4em",
-                          color: "hsl(40 65% 38%)",
-                          textShadow: "0 0 18px hsl(45 90% 80% / 0.9)",
+                          letterSpacing: "0.42em",
+                          color: "hsl(40 65% 36%)",
+                          textShadow: "0 0 24px hsl(45 90% 80% / 0.95)",
                         }}
-                        initial={{ opacity: 0, y: 6, filter: "blur(4px)" }}
+                        initial={{ opacity: 0, y: 8, filter: "blur(5px)" }}
                         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                        transition={{ duration: 0.45, delay: 0.3 + i * 0.05, ease: [0.25, 0.1, 0.25, 1] }}
+                        transition={{ duration: 0.5, delay: 0.32 + i * 0.06, ease: [0.25, 0.1, 0.25, 1] }}
                       >
                         {letter}
                       </motion.span>
@@ -219,7 +230,7 @@ const EvaraGifTransition = ({ isActive, onMidpoint, onComplete }: EvaraGifTransi
                       className="absolute inset-0 pointer-events-none"
                       initial={{ x: "-110%", opacity: 0 }}
                       animate={{ x: "110%", opacity: [0, 1, 0] }}
-                      transition={{ duration: 0.7, delay: 0.45, ease: "easeInOut" }}
+                      transition={{ duration: 0.8, delay: 0.5, ease: "easeInOut" }}
                       style={{
                         background:
                           "linear-gradient(100deg, transparent 30%, hsl(45 100% 95% / 0.95) 50%, transparent 70%)",
@@ -228,18 +239,30 @@ const EvaraGifTransition = ({ isActive, onMidpoint, onComplete }: EvaraGifTransi
                     />
                   </div>
 
-                  {/* Bottom hairline */}
+                  {/* Bottom hairline with a small diamond at center */}
                   <motion.div
-                    className="h-px"
-                    style={{ background: "linear-gradient(90deg, transparent, hsl(40 70% 45% / 0.7), transparent)" }}
-                    initial={{ width: 0 }}
-                    animate={{ width: 90 }}
-                    transition={{ duration: 0.5, delay: 0.25, ease: "easeOut" }}
-                  />
+                    className="relative flex items-center justify-center"
+                    initial={{ width: 0, opacity: 0 }}
+                    animate={{ width: 220, opacity: 1 }}
+                    transition={{ duration: 0.55, delay: 0.22, ease: "easeOut" }}
+                  >
+                    <div
+                      className="h-px w-full"
+                      style={{ background: "linear-gradient(90deg, transparent, hsl(40 70% 45% / 0.75), transparent)" }}
+                    />
+                    <motion.div
+                      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rotate-45"
+                      style={{ width: 7, height: 7, border: "1px solid hsl(40 70% 45% / 0.85)", background: "hsl(45 90% 88% / 0.5)" }}
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.4, delay: 0.42, ease: [0.34, 1.56, 0.64, 1] }}
+                    />
+                  </motion.div>
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
+
 
           {/* Audio + mute toggle */}
           <audio ref={audioRef} preload="auto">

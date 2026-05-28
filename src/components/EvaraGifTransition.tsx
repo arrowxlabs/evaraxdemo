@@ -52,8 +52,8 @@ const EvaraGifTransition = ({ isActive, onMidpoint, onComplete }: EvaraGifTransi
     const video = videoRef.current;
     if (!video) return;
 
-    // Original speed for natural smooth playback
-    video.playbackRate = 1.0;
+    // Slightly snappier than real-time but still smooth & cinematic
+    video.playbackRate = 1.2;
     video.currentTime = 0;
 
     const playPromise = video.play();

@@ -454,6 +454,23 @@ const Index = () => {
       {/* ===== PROPERTIES SECTION — Card layout like reference ===== */}
       <main id="properties" className="pt-0 md:pt-2 pb-10 md:pb-16 px-5 sm:px-8 md:px-10" style={{ background: "hsl(var(--background))" }}>
 
+        {/* Luxury section header with animated vector ornament */}
+        <motion.div
+          className="flex flex-col items-center text-center mb-10 md:mb-14"
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+        >
+          <span className="text-[9px] tracking-[0.45em] uppercase text-muted-foreground/60 font-body mb-4" style={{ fontWeight: 400 }}>
+            Our Collection
+          </span>
+          <h2 className="font-display tracking-wide text-3xl sm:text-4xl md:text-5xl text-foreground" style={{ fontWeight: 300 }}>
+            Three <span className="italic" style={{ color: "hsl(var(--gold))" }}>Iconic</span> Retreats
+          </h2>
+          <LuxuryOrnament width={200} className="mt-5" tone="gold" />
+        </motion.div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 max-w-6xl mx-auto">
           {hotels.map((hotel, index) => (
             <HotelCard

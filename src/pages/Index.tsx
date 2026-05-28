@@ -495,8 +495,9 @@ const Index = () => {
             <div className="flex items-center justify-center gap-1 mb-2">
               <span className="text-xl md:text-2xl tracking-[0.3em] uppercase font-display text-background" style={{ fontWeight: 300 }}>EVARA</span>
               <span className="text-xl md:text-2xl tracking-[0.06em] font-display" style={{ fontWeight: 300, color: "hsl(var(--gold))" }}>Co.</span>
-            </div>
             <span className="text-[8px] tracking-[0.5em] uppercase font-body" style={{ fontWeight: 300, color: "hsl(var(--gold) / 0.5)" }}>Luxury Hospitality</span>
+            <LuxuryOrnament width={160} className="mx-auto mt-4" tone="light" />
+
             <div className="w-16 h-px mx-auto mt-4" style={{ background: "linear-gradient(90deg, transparent, hsl(var(--gold) / 0.3), transparent)" }} />
           </div>
 

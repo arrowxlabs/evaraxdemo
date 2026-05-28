@@ -81,16 +81,26 @@ const Index = () => {
   // Evara-only cinematic GIF/video transition
   const [evaraTransitionActive, setEvaraTransitionActive] = useState(false);
 
-  // Preload the transition video once so playback is instant on click
+  // Preload the transition video + audio once so playback is instant on click.
+  // Kept on a ref so the browser doesn't drop the warmed cache before use.
+  const preloadRef = useRef<HTMLVideoElement | null>(null);
   useEffect(() => {
+    const supportsWebm = document
+      .createElement("video")
+      .canPlayType("video/webm");
     const v = document.createElement("video");
     v.preload = "auto";
     v.muted = true;
-    v.src = "/transitions/evara-transition-fast.mp4";
+    (v as HTMLVideoElement & { playsInline: boolean }).playsInline = true;
+    v.src = supportsWebm
+      ? "/transitions/evara-transition-fast.webm"
+      : "/transitions/evara-transition-fast.mp4";
     v.load();
+    preloadRef.current = v;
     const a = new Audio("/transitions/evara-chime.m4a");
     a.preload = "auto";
   }, []);
+
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);

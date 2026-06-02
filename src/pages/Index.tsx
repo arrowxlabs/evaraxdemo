@@ -445,11 +445,12 @@ const Index = () => {
             <div className="flex flex-wrap items-center gap-4 mt-9">
               <a
                 href="#properties"
-                className="px-8 py-3.5 bg-foreground text-background text-[9px] tracking-[0.25em] uppercase font-body inline-flex items-center gap-2 hover:bg-foreground/90 transition-colors"
+                className="luxe-shimmer px-8 py-3.5 bg-foreground text-background text-[10px] tracking-[0.28em] uppercase font-body inline-flex items-center gap-2 hover:bg-foreground/90 transition-colors"
                 style={{ fontWeight: 500 }}
               >
-                Explore Hotels
+                Explore Hotels <ArrowRight className="w-3 h-3" />
               </a>
+
               <a
                 href="#properties"
                 className="px-6 py-3.5 text-[9px] tracking-[0.25em] uppercase font-body inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"

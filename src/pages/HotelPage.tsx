@@ -619,14 +619,14 @@ const HotelPage = () => {
       {/* Rooms & Suites */}
       <FadeSection>
         <section id="rooms" className="section-padding">
-          <div className="text-center mb-10 md:mb-14">
-            <span className="text-[9px] tracking-[0.3em] uppercase text-primary/50 font-body" style={{ fontWeight: 300 }}>Accommodations</span>
-            <h2 className="text-xl sm:text-2xl md:text-4xl font-display mt-2 text-foreground tracking-wide" style={{ fontWeight: 500 }}>Rooms & Suites</h2>
-            <div className="w-12 h-px mx-auto mt-4" style={{ background: "hsl(var(--gold) / 0.4)" }} />
-            <p className="text-sm text-muted-foreground font-body mt-4 max-w-md mx-auto leading-relaxed" style={{ fontWeight: 300 }}>
-              Thoughtfully designed for comfort and elegance.
-            </p>
-          </div>
+          <SectionHeader
+            eyebrow="Accommodations"
+            title="Rooms &"
+            accent="Suites"
+            subtitle="Each residence is thoughtfully composed — natural light, hand-finished textiles, and quiet luxury at every turn."
+            className="mb-10 md:mb-14"
+          />
+
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
             {hotel.rooms.map((room, i) => (

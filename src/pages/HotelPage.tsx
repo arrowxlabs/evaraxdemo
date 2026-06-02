@@ -632,14 +632,14 @@ const HotelPage = () => {
             {hotel.rooms.map((room, i) => (
               <motion.div
                 key={i}
-                className="group relative bg-background rounded-2xl overflow-hidden transition-all duration-500"
-                style={{ border: "1px solid hsl(var(--border) / 0.2)" }}
+                className="group relative bg-background rounded-2xl overflow-hidden luxe-lift luxe-fog"
+                style={{ border: "1px solid hsl(var(--border) / 0.25)" }}
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1, duration: 0.6 }}
-                whileHover={{ y: -8 }}
               >
+
                 {/* Full-bleed image */}
                 <div className="relative overflow-hidden">
                   <img src={room.image} alt={room.name} className="w-full aspect-[4/3] object-cover group-hover:scale-110 transition-transform duration-700 ease-out" loading="lazy" />

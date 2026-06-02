@@ -738,34 +738,47 @@ const HotelPage = () => {
         </section>
       </FadeSection>
 
-      {/* Booking / Contact Form */}
+      {/* Reserve Flow */}
       <FadeSection>
         <section id="booking" className="section-padding">
           <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-10">
-              <span className="text-[9px] tracking-[0.3em] uppercase text-primary/50 font-body" style={{ fontWeight: 300 }}>Reservations</span>
-              <h2 className="text-xl sm:text-2xl md:text-4xl font-display mt-2 text-foreground tracking-wide" style={{ fontWeight: 300 }}>Book Your Stay</h2>
-              <div className="w-12 h-px mx-auto mt-3" style={{ background: "hsl(var(--gold) / 0.4)" }} />
-            </div>
-            <BookingForm hotelName={hotel.name} />
+            <SectionHeader
+              eyebrow="Reservations"
+              title="Reserve Your"
+              accent="Stay"
+              subtitle="Three quiet steps. Personally confirmed by our concierge within 24 hours."
+              className="mb-10"
+            />
+            <ReserveFlow hotelName={hotel.name} rooms={hotel.rooms} />
           </div>
         </section>
       </FadeSection>
 
       <section className="section-padding text-center" style={{ background: "hsl(var(--foreground))" }}>
         <FadeSection>
-          <span className="text-[9px] tracking-[0.3em] uppercase text-primary/60 font-body" style={{ fontWeight: 300 }}>Ready to Experience</span>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-display mt-2 text-background tracking-wide" style={{ fontWeight: 300 }}>{hotel.name}</h2>
-          <div className="w-12 h-px mx-auto mt-3 mb-5" style={{ background: "hsl(var(--gold) / 0.4)" }} />
-          <p className="text-background/30 font-body max-w-sm mx-auto text-sm" style={{ fontWeight: 300 }}>
+          <SectionHeader
+            eyebrow="Ready to Experience"
+            title={hotel.name}
+            tone="light"
+            className="mb-2"
+          />
+          <p className="text-background/40 font-body max-w-sm mx-auto text-sm mt-3" style={{ fontWeight: 300 }}>
             Reserve your stay and discover unparalleled luxury.
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-4 mt-6">
-            <a href="tel:+919031027961" className="px-7 py-2.5 bg-primary text-primary-foreground text-[9px] tracking-[0.25em] uppercase font-body rounded-full hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 inline-flex items-center gap-2" style={{ fontWeight: 400 }}>
-              <Phone className="w-3 h-3" /> Reserve Now
+          <div className="flex flex-wrap items-center justify-center gap-4 mt-7">
+            <a
+              href="#booking"
+              className="luxe-shimmer px-8 py-3 text-[10px] tracking-[0.28em] uppercase font-body inline-flex items-center gap-2 transition-all duration-300"
+              style={{ background: "hsl(var(--gold))", color: "hsl(var(--foreground))", fontWeight: 500 }}
+            >
+              Reserve Now <ArrowRight className="w-3 h-3" />
+            </a>
+            <a href="tel:+919031027961" className="px-7 py-3 text-[10px] tracking-[0.28em] uppercase font-body inline-flex items-center gap-2 text-background/70 hover:text-background transition-colors" style={{ border: "1px solid hsl(var(--background) / 0.25)", fontWeight: 400 }}>
+              <Phone className="w-3 h-3" /> +91 9031027961
             </a>
           </div>
         </FadeSection>
+
       </section>
 
       {/* Lightbox Modal */}

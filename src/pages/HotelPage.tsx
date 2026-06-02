@@ -560,11 +560,8 @@ const HotelPage = () => {
       {/* Mosaic Gallery — inspired by Atlantis Royal reference pic 5 */}
       <FadeSection>
         <section id="gallery" className="section-padding bg-secondary">
-          <div className="text-center mb-10">
-            <span className="text-[9px] tracking-[0.3em] uppercase text-primary/50 font-body" style={{ fontWeight: 300 }}>Gallery</span>
-            <h3 className="text-xl md:text-3xl font-display mt-2 text-foreground tracking-wide" style={{ fontWeight: 500 }}>Moments & Spaces</h3>
-            <div className="w-12 h-px mx-auto mt-3" style={{ background: "hsl(var(--gold) / 0.4)" }} />
-          </div>
+          <SectionHeader eyebrow="Gallery" title="Moments &" accent="Spaces" className="mb-10" />
+
           <div className="max-w-6xl mx-auto">
             {/* Atlantis-style scattered mosaic gallery */}
             <div className="relative w-full" style={{ minHeight: "clamp(400px, 60vw, 700px)" }}>

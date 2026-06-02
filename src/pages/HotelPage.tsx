@@ -668,14 +668,16 @@ const HotelPage = () => {
                     ))}
                   </div>
 
-                  <motion.button
-                    className="w-full mt-4 py-3 rounded-xl text-[9px] tracking-[0.2em] uppercase font-body bg-foreground text-background hover:bg-foreground/90 transition-all duration-300"
+                  <motion.a
+                    href="#booking"
+                    className="luxe-shimmer w-full mt-4 py-3 rounded-xl text-[9px] tracking-[0.2em] uppercase font-body bg-foreground text-background hover:bg-foreground/90 transition-all duration-300 inline-flex items-center justify-center gap-2"
                     style={{ fontWeight: 500 }}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.97 }}
                   >
-                    Reserve Now
-                  </motion.button>
+                    Reserve Now <ArrowRight className="w-3 h-3" />
+                  </motion.a>
+
                 </div>
               </motion.div>
             ))}

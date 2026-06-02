@@ -501,10 +501,8 @@ const HotelPage = () => {
       <FadeSection>
         <section className="section-padding" style={{ background: "hsl(var(--background))" }}>
           <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-10">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-display text-foreground tracking-wide" style={{ fontWeight: 300 }}>Plan Your Stay in Minutes</h2>
-              <div className="w-12 h-px mx-auto mt-3" style={{ background: "hsl(var(--gold) / 0.4)" }} />
-            </div>
+            <SectionHeader eyebrow="The Journey" title="Plan Your" accent="Stay" className="mb-10" />
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
               {/* Images stack */}
               <div className="relative h-[300px] sm:h-[380px] md:h-[420px]">

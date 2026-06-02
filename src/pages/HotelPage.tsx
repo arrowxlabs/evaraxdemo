@@ -17,6 +17,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import constructionImg from "@/assets/construction-coming-soon.png";
+import SectionHeader from "@/components/SectionHeader";
+import ReserveFlow from "@/components/ReserveFlow";
+
 
 gsap.registerPlugin(ScrollTrigger);
 

@@ -688,11 +688,8 @@ const HotelPage = () => {
       {/* Amenities */}
       <FadeSection>
         <section id="amenities" className="section-padding bg-secondary">
-          <div className="text-center mb-10">
-            <span className="text-[9px] tracking-[0.3em] uppercase text-primary/50 font-body" style={{ fontWeight: 300 }}>Experience</span>
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-display mt-2 text-foreground tracking-wide" style={{ fontWeight: 300 }}>Amenities</h2>
-            <div className="w-12 h-px mx-auto mt-3" style={{ background: "hsl(var(--gold) / 0.4)" }} />
-          </div>
+          <SectionHeader eyebrow="Curated Experience" title="Hotel" accent="Amenities" className="mb-10" />
+
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 md:gap-3 max-w-4xl mx-auto">
             {hotel.amenities.map((amenity, i) => (
               <motion.div

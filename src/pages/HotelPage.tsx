@@ -275,10 +275,18 @@ const HotelPage = () => {
           </div>
 
           <div className="hidden md:flex items-center gap-5">
-            {["About", "Experience", "Rooms", "Gallery", "Booking", "Amenities"].map((item) => (
+            {["About", "Experience", "Rooms", "Gallery", "Amenities"].map((item) => (
               <a key={item} href={`#${item.toLowerCase()}`} className="text-[9px] tracking-[0.12em] uppercase text-muted-foreground hover:text-primary transition-colors font-body" style={{ fontWeight: 300 }}>{item}</a>
             ))}
+            <a
+              href="#booking"
+              className="ml-2 px-4 py-1.5 text-[9px] tracking-[0.2em] uppercase font-body bg-foreground text-background hover:bg-foreground/85 transition-colors"
+              style={{ fontWeight: 400 }}
+            >
+              Reserve
+            </a>
           </div>
+
 
           <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden text-foreground">
             {menuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
@@ -317,23 +325,96 @@ const HotelPage = () => {
         </AnimatePresence>
       </nav>
 
-      {/* Hero — no picture box, shown directly on background */}
-      <section ref={heroRef} className="relative pt-12 md:pt-14">
-        <motion.img src={hotel.heroImage} alt={hotel.name} className="w-full object-contain" style={{ y: heroY }} />
-        <motion.div className="max-w-7xl mx-auto px-5 sm:px-8 md:px-14 py-6 md:py-10" style={{ opacity: heroOpacity }}>
-          <div className="flex gap-1 mb-2">
-            {Array.from({ length: hotel.rating }).map((_, i) => (
-              <Star key={i} className="w-2.5 h-2.5 text-primary fill-primary" />
-            ))}
-          </div>
-          <span className="text-[9px] tracking-[0.3em] uppercase text-muted-foreground/60 font-body" style={{ fontWeight: 300 }}>{hotel.tagline}</span>
-          <h1 className="text-3xl sm:text-4xl md:text-6xl font-display text-foreground mt-1 tracking-wide" style={{ fontWeight: 300 }}>{hotel.name}</h1>
-          <div className="flex items-center gap-2 mt-3">
-            <MapPin className="w-3 h-3 text-muted-foreground/40" />
-            <span className="text-[10px] text-muted-foreground/50 font-body" style={{ fontWeight: 300 }}>{hotel.address}</span>
+      {/* ===== CINEMATIC HERO — Aman / Rosewood style full-bleed ===== */}
+      <section ref={heroRef} className="relative h-[88vh] md:h-screen w-full overflow-hidden">
+        <motion.div className="absolute inset-0" style={{ y: heroY }}>
+          <img
+            src={hotel.heroImage}
+            alt={hotel.name}
+            className="w-full h-[115%] object-cover"
+            loading="eager"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/75" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/35 via-transparent to-transparent" />
+        </motion.div>
+
+        <motion.div
+          className="absolute inset-x-0 bottom-0 z-10 px-5 sm:px-8 md:px-14 pb-14 md:pb-24"
+          style={{ opacity: heroOpacity }}
+        >
+          <div className="max-w-7xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1.1, delay: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+              className="max-w-2xl"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <span className="h-px w-10" style={{ background: "hsl(var(--gold) / 0.75)" }} />
+                <span className="text-[10px] tracking-[0.45em] uppercase font-body" style={{ color: "hsl(var(--gold-light))", fontWeight: 400 }}>
+                  {hotel.tagline}
+                </span>
+              </div>
+
+              <h1
+                className="font-display text-white leading-[1.02] tracking-wide"
+                style={{
+                  fontWeight: 300,
+                  fontSize: "clamp(2.5rem, 7vw, 5.5rem)",
+                  textShadow: "0 2px 30px rgba(0,0,0,0.4)",
+                }}
+              >
+                {hotel.name}
+              </h1>
+
+              <div className="flex flex-wrap items-center gap-x-6 gap-y-3 mt-5 text-white/85">
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-3.5 h-3.5" style={{ color: "hsl(var(--gold-light))" }} />
+                  <span className="text-[11px] md:text-xs font-body tracking-wide" style={{ fontWeight: 300 }}>{hotel.address}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: hotel.rating }).map((_, i) => (
+                    <Star key={i} className="w-3 h-3 fill-current" style={{ color: "hsl(var(--gold-light))" }} />
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3 mt-8">
+                <a
+                  href="#booking"
+                  className="px-7 py-3 text-[10px] tracking-[0.28em] uppercase font-body inline-flex items-center gap-2 transition-all duration-300 hover:opacity-90"
+                  style={{ background: "hsl(var(--gold))", color: "hsl(var(--background))", fontWeight: 400 }}
+                >
+                  Reserve a Stay <ArrowRight className="w-3 h-3" />
+                </a>
+                <a
+                  href="#about"
+                  className="px-7 py-3 text-[10px] tracking-[0.28em] uppercase font-body inline-flex items-center gap-2 text-white/90 hover:text-white transition-colors"
+                  style={{ fontWeight: 400, border: "1px solid rgba(255,255,255,0.28)" }}
+                >
+                  Discover
+                </a>
+              </div>
+            </motion.div>
           </div>
         </motion.div>
+
+        <motion.div
+          className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.4, duration: 0.6 }}
+        >
+          <span className="text-[8px] tracking-[0.4em] uppercase text-white/60 font-body">Scroll</span>
+          <motion.span
+            className="h-8 w-px block"
+            style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.7), transparent)" }}
+            animate={{ scaleY: [0.4, 1, 0.4], opacity: [0.4, 1, 0.4] }}
+            transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </motion.div>
       </section>
+
 
       {/* About with elegant layout */}
       <FadeSection>

@@ -125,6 +125,62 @@
   .luxury-shadow {
     box-shadow: 0 4px 30px hsl(30 10% 12% / 0.06);
   }
+
+  /* ===== 5★ EDITORIAL UTILITIES (Aman / Rosewood inspired) ===== */
+  .eyebrow {
+    font-family: var(--font-body);
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.45em;
+    text-transform: uppercase;
+    color: hsl(var(--muted-foreground) / 0.7);
+  }
+  .eyebrow-light { color: hsl(var(--background) / 0.7); }
+  .hairline-center {
+    height: 1px;
+    width: 56px;
+    margin: 0 auto;
+    background: linear-gradient(90deg, transparent, hsl(var(--gold) / 0.6), transparent);
+  }
+  .btn-ghost-line {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1.75rem;
+    font-family: var(--font-body);
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    border: 1px solid hsl(var(--foreground) / 0.2);
+    color: hsl(var(--foreground));
+    background: transparent;
+    transition: all 0.3s ease;
+  }
+  .btn-ghost-line:hover {
+    background: hsl(var(--foreground));
+    color: hsl(var(--background));
+    border-color: hsl(var(--foreground));
+  }
+  .btn-gold-line {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1.75rem;
+    font-family: var(--font-body);
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    border: 1px solid hsl(var(--gold) / 0.6);
+    color: hsl(var(--gold));
+    background: transparent;
+    transition: all 0.3s ease;
+  }
+  .btn-gold-line:hover {
+    background: hsl(var(--gold));
+    color: hsl(var(--background));
+  }
 }
 
 @layer utilities {

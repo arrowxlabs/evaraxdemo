@@ -197,7 +197,100 @@
     -webkit-backface-visibility: hidden;
     will-change: transform;
   }
+
+  /* ===== Luxury micro-animations ===== */
+  /* Shimmer sweep across primary CTAs */
+  .luxe-shimmer {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .luxe-shimmer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      115deg,
+      transparent 30%,
+      hsl(var(--gold-light) / 0.35) 50%,
+      transparent 70%
+    );
+    transform: translateX(-120%);
+    transition: transform 0.9s cubic-bezier(0.25, 0.1, 0.25, 1);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .luxe-shimmer:hover::after {
+    transform: translateX(120%);
+  }
+  .luxe-shimmer > * { position: relative; z-index: 2; }
+
+  /* Soft fog wash that pulses over a card on hover */
+  .luxe-fog {
+    position: relative;
+    isolation: isolate;
+  }
+  .luxe-fog::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      120% 80% at 50% 0%,
+      hsl(var(--gold-light) / 0.18),
+      transparent 60%
+    );
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .luxe-fog:hover::before { opacity: 1; }
+
+  /* Lift + gold shadow on hover */
+  .luxe-lift {
+    transition: transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1),
+                box-shadow 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  .luxe-lift:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 24px 60px -20px hsl(var(--gold) / 0.25),
+                0 8px 24px -8px hsl(30 10% 12% / 0.12);
+  }
+
+  /* Gold underline grow */
+  .luxe-underline {
+    position: relative;
+  }
+  .luxe-underline::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    height: 1px;
+    width: 100%;
+    background: hsl(var(--gold));
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  .luxe-underline:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  /* Continuous gentle shimmer for hero accents */
+  .animate-shimmer-slow {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--gold) / 0.6) 0%,
+      hsl(var(--gold-light)) 50%,
+      hsl(var(--gold) / 0.6) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmerSlide 4s ease-in-out infinite;
+  }
 }
+
 
 @media (prefers-reduced-motion: no-preference) {
   * {
@@ -223,3 +316,14 @@
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+@keyframes shimmerSlide {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes fogPulse {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.04); }
+}
+

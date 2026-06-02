@@ -17,6 +17,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import constructionImg from "@/assets/construction-coming-soon.png";
+import SectionHeader from "@/components/SectionHeader";
+import ReserveFlow from "@/components/ReserveFlow";
+
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -78,133 +81,8 @@ const ParallaxImage = ({ src, alt, className }: { src: string; alt: string; clas
   );
 };
 
-const bookingSchema = z.object({
-  name: z.string().trim().min(2, "Name is required").max(100),
-  email: z.string().trim().email("Please enter a valid email").max(255),
-  phone: z.string().trim().min(10, "Please enter a valid phone number").max(15),
-  message: z.string().trim().max(500).optional(),
-});
+// (Legacy single-step BookingForm replaced by multi-step <ReserveFlow />)
 
-type BookingFormValues = z.infer<typeof bookingSchema> & { checkIn?: Date; checkOut?: Date };
-
-const BookingForm = ({ hotelName }: { hotelName: string }) => {
-  const [checkIn, setCheckIn] = useState<Date>();
-  const [checkOut, setCheckOut] = useState<Date>();
-  const [submitted, setSubmitted] = useState(false);
-
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<BookingFormValues>({
-    resolver: zodResolver(bookingSchema),
-  });
-
-  const onSubmit = (data: BookingFormValues) => {
-    if (!checkIn) { toast.error("Please select a check-in date"); return; }
-    if (!checkOut) { toast.error("Please select a check-out date"); return; }
-    if (checkOut <= checkIn) { toast.error("Check-out must be after check-in"); return; }
-    toast.success(`Thank you, ${data.name}! We'll contact you shortly about your reservation at ${hotelName}.`);
-    setSubmitted(true);
-    reset();
-    setCheckIn(undefined);
-    setCheckOut(undefined);
-    setTimeout(() => setSubmitted(false), 3000);
-  };
-
-  return (
-    <motion.form
-      onSubmit={handleSubmit(onSubmit)}
-      className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 p-6 md:p-10 rounded-2xl bg-card"
-      style={{ border: "1px solid hsl(var(--border) / 0.3)", boxShadow: "0 4px 30px rgba(0,0,0,0.04)" }}
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.6 }}
-    >
-      {/* Name */}
-      <div className="space-y-1.5">
-        <label className="text-[9px] tracking-[0.2em] uppercase text-muted-foreground font-body" style={{ fontWeight: 400 }}>Full Name *</label>
-        <div className="relative">
-          <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/40" />
-          <Input {...register("name")} placeholder="Your name" className="pl-10 h-11 text-sm font-body border-border/30 focus:border-primary/40" style={{ fontWeight: 300 }} />
-        </div>
-        {errors.name && <p className="text-[10px] text-destructive">{errors.name.message}</p>}
-      </div>
-
-      {/* Email */}
-      <div className="space-y-1.5">
-        <label className="text-[9px] tracking-[0.2em] uppercase text-muted-foreground font-body" style={{ fontWeight: 400 }}>Email *</label>
-        <div className="relative">
-          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/40" />
-          <Input {...register("email")} type="email" placeholder="your@email.com" className="pl-10 h-11 text-sm font-body border-border/30 focus:border-primary/40" style={{ fontWeight: 300 }} />
-        </div>
-        {errors.email && <p className="text-[10px] text-destructive">{errors.email.message}</p>}
-      </div>
-
-      {/* Phone */}
-      <div className="space-y-1.5">
-        <label className="text-[9px] tracking-[0.2em] uppercase text-muted-foreground font-body" style={{ fontWeight: 400 }}>Phone *</label>
-        <div className="relative">
-          <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/40" />
-          <Input {...register("phone")} type="tel" placeholder="+91 9031027961" className="pl-10 h-11 text-sm font-body border-border/30 focus:border-primary/40" style={{ fontWeight: 300 }} />
-        </div>
-        {errors.phone && <p className="text-[10px] text-destructive">{errors.phone.message}</p>}
-      </div>
-
-      {/* Dates row */}
-      <div className="flex gap-3">
-        <div className="flex-1 space-y-1.5">
-          <label className="text-[9px] tracking-[0.2em] uppercase text-muted-foreground font-body" style={{ fontWeight: 400 }}>Check-in *</label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className={cn("w-full h-11 justify-start text-left font-body text-sm border-border/30", !checkIn && "text-muted-foreground")} style={{ fontWeight: 300 }}>
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {checkIn ? format(checkIn, "MMM dd") : "Select"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar mode="single" selected={checkIn} onSelect={setCheckIn} disabled={(d) => d < new Date()} initialFocus className="p-3 pointer-events-auto" />
-            </PopoverContent>
-          </Popover>
-        </div>
-        <div className="flex-1 space-y-1.5">
-          <label className="text-[9px] tracking-[0.2em] uppercase text-muted-foreground font-body" style={{ fontWeight: 400 }}>Check-out *</label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className={cn("w-full h-11 justify-start text-left font-body text-sm border-border/30", !checkOut && "text-muted-foreground")} style={{ fontWeight: 300 }}>
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {checkOut ? format(checkOut, "MMM dd") : "Select"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar mode="single" selected={checkOut} onSelect={setCheckOut} disabled={(d) => d < (checkIn || new Date())} initialFocus className="p-3 pointer-events-auto" />
-            </PopoverContent>
-          </Popover>
-        </div>
-      </div>
-
-      {/* Message — full width */}
-      <div className="md:col-span-2 space-y-1.5">
-        <label className="text-[9px] tracking-[0.2em] uppercase text-muted-foreground font-body" style={{ fontWeight: 400 }}>Special Requests</label>
-        <Textarea {...register("message")} placeholder="Any special requests or preferences..." className="min-h-[80px] text-sm font-body border-border/30 focus:border-primary/40 resize-none" style={{ fontWeight: 300 }} />
-      </div>
-
-      {/* Submit */}
-      <div className="md:col-span-2">
-        <motion.button
-          type="submit"
-          className="w-full py-3.5 rounded-lg text-[10px] tracking-[0.25em] uppercase font-body bg-foreground text-background hover:bg-foreground/90 transition-all duration-300 flex items-center justify-center gap-2"
-          style={{ fontWeight: 400 }}
-          whileHover={{ scale: 1.01 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          {submitted ? (
-            <><CheckCircle2 className="w-4 h-4" /> Request Sent</>
-          ) : (
-            <><Send className="w-3.5 h-3.5" /> Send Booking Request</>
-          )}
-        </motion.button>
-      </div>
-    </motion.form>
-  );
-};
 
 const HotelPage = () => {
   const { id } = useParams();
@@ -498,10 +376,8 @@ const HotelPage = () => {
       <FadeSection>
         <section className="section-padding" style={{ background: "hsl(var(--background))" }}>
           <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-10">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-display text-foreground tracking-wide" style={{ fontWeight: 300 }}>Plan Your Stay in Minutes</h2>
-              <div className="w-12 h-px mx-auto mt-3" style={{ background: "hsl(var(--gold) / 0.4)" }} />
-            </div>
+            <SectionHeader eyebrow="The Journey" title="Plan Your" accent="Stay" className="mb-10" />
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
               {/* Images stack */}
               <div className="relative h-[300px] sm:h-[380px] md:h-[420px]">
@@ -559,11 +435,8 @@ const HotelPage = () => {
       {/* Mosaic Gallery — inspired by Atlantis Royal reference pic 5 */}
       <FadeSection>
         <section id="gallery" className="section-padding bg-secondary">
-          <div className="text-center mb-10">
-            <span className="text-[9px] tracking-[0.3em] uppercase text-primary/50 font-body" style={{ fontWeight: 300 }}>Gallery</span>
-            <h3 className="text-xl md:text-3xl font-display mt-2 text-foreground tracking-wide" style={{ fontWeight: 500 }}>Moments & Spaces</h3>
-            <div className="w-12 h-px mx-auto mt-3" style={{ background: "hsl(var(--gold) / 0.4)" }} />
-          </div>
+          <SectionHeader eyebrow="Gallery" title="Moments &" accent="Spaces" className="mb-10" />
+
           <div className="max-w-6xl mx-auto">
             {/* Atlantis-style scattered mosaic gallery */}
             <div className="relative w-full" style={{ minHeight: "clamp(400px, 60vw, 700px)" }}>
@@ -621,27 +494,27 @@ const HotelPage = () => {
       {/* Rooms & Suites */}
       <FadeSection>
         <section id="rooms" className="section-padding">
-          <div className="text-center mb-10 md:mb-14">
-            <span className="text-[9px] tracking-[0.3em] uppercase text-primary/50 font-body" style={{ fontWeight: 300 }}>Accommodations</span>
-            <h2 className="text-xl sm:text-2xl md:text-4xl font-display mt-2 text-foreground tracking-wide" style={{ fontWeight: 500 }}>Rooms & Suites</h2>
-            <div className="w-12 h-px mx-auto mt-4" style={{ background: "hsl(var(--gold) / 0.4)" }} />
-            <p className="text-sm text-muted-foreground font-body mt-4 max-w-md mx-auto leading-relaxed" style={{ fontWeight: 300 }}>
-              Thoughtfully designed for comfort and elegance.
-            </p>
-          </div>
+          <SectionHeader
+            eyebrow="Accommodations"
+            title="Rooms &"
+            accent="Suites"
+            subtitle="Each residence is thoughtfully composed — natural light, hand-finished textiles, and quiet luxury at every turn."
+            className="mb-10 md:mb-14"
+          />
+
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
             {hotel.rooms.map((room, i) => (
               <motion.div
                 key={i}
-                className="group relative bg-background rounded-2xl overflow-hidden transition-all duration-500"
-                style={{ border: "1px solid hsl(var(--border) / 0.2)" }}
+                className="group relative bg-background rounded-2xl overflow-hidden luxe-lift luxe-fog"
+                style={{ border: "1px solid hsl(var(--border) / 0.25)" }}
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1, duration: 0.6 }}
-                whileHover={{ y: -8 }}
               >
+
                 {/* Full-bleed image */}
                 <div className="relative overflow-hidden">
                   <img src={room.image} alt={room.name} className="w-full aspect-[4/3] object-cover group-hover:scale-110 transition-transform duration-700 ease-out" loading="lazy" />
@@ -670,14 +543,16 @@ const HotelPage = () => {
                     ))}
                   </div>
 
-                  <motion.button
-                    className="w-full mt-4 py-3 rounded-xl text-[9px] tracking-[0.2em] uppercase font-body bg-foreground text-background hover:bg-foreground/90 transition-all duration-300"
+                  <motion.a
+                    href="#booking"
+                    className="luxe-shimmer w-full mt-4 py-3 rounded-xl text-[9px] tracking-[0.2em] uppercase font-body bg-foreground text-background hover:bg-foreground/90 transition-all duration-300 inline-flex items-center justify-center gap-2"
                     style={{ fontWeight: 500 }}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.97 }}
                   >
-                    Reserve Now
-                  </motion.button>
+                    Reserve Now <ArrowRight className="w-3 h-3" />
+                  </motion.a>
+
                 </div>
               </motion.div>
             ))}
@@ -688,26 +563,25 @@ const HotelPage = () => {
       {/* Amenities */}
       <FadeSection>
         <section id="amenities" className="section-padding bg-secondary">
-          <div className="text-center mb-10">
-            <span className="text-[9px] tracking-[0.3em] uppercase text-primary/50 font-body" style={{ fontWeight: 300 }}>Experience</span>
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-display mt-2 text-foreground tracking-wide" style={{ fontWeight: 300 }}>Amenities</h2>
-            <div className="w-12 h-px mx-auto mt-3" style={{ background: "hsl(var(--gold) / 0.4)" }} />
-          </div>
+          <SectionHeader eyebrow="Curated Experience" title="Hotel" accent="Amenities" className="mb-10" />
+
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 md:gap-3 max-w-4xl mx-auto">
             {hotel.amenities.map((amenity, i) => (
               <motion.div
                 key={i}
-                className="flex flex-col items-center gap-1.5 p-3 md:p-4 glass-card rounded-lg hover-gold-border text-center transition-all duration-300"
+                className="flex flex-col items-center gap-1.5 p-3 md:p-4 glass-card rounded-lg hover-gold-border luxe-fog text-center transition-all duration-300"
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.04, duration: 0.4 }}
+                whileHover={{ y: -3 }}
               >
-                <div className="text-primary/60">
+                <div className="text-primary/60 transition-transform duration-300 group-hover:scale-110">
                   {amenityIcons[amenity] || <Wifi className="w-4 h-4" />}
                 </div>
                 <span className="text-[9px] sm:text-[10px] text-muted-foreground font-body" style={{ fontWeight: 300 }}>{amenity}</span>
               </motion.div>
+
             ))}
           </div>
         </section>
@@ -739,34 +613,47 @@ const HotelPage = () => {
         </section>
       </FadeSection>
 
-      {/* Booking / Contact Form */}
+      {/* Reserve Flow */}
       <FadeSection>
         <section id="booking" className="section-padding">
           <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-10">
-              <span className="text-[9px] tracking-[0.3em] uppercase text-primary/50 font-body" style={{ fontWeight: 300 }}>Reservations</span>
-              <h2 className="text-xl sm:text-2xl md:text-4xl font-display mt-2 text-foreground tracking-wide" style={{ fontWeight: 300 }}>Book Your Stay</h2>
-              <div className="w-12 h-px mx-auto mt-3" style={{ background: "hsl(var(--gold) / 0.4)" }} />
-            </div>
-            <BookingForm hotelName={hotel.name} />
+            <SectionHeader
+              eyebrow="Reservations"
+              title="Reserve Your"
+              accent="Stay"
+              subtitle="Three quiet steps. Personally confirmed by our concierge within 24 hours."
+              className="mb-10"
+            />
+            <ReserveFlow hotelName={hotel.name} rooms={hotel.rooms} />
           </div>
         </section>
       </FadeSection>
 
       <section className="section-padding text-center" style={{ background: "hsl(var(--foreground))" }}>
         <FadeSection>
-          <span className="text-[9px] tracking-[0.3em] uppercase text-primary/60 font-body" style={{ fontWeight: 300 }}>Ready to Experience</span>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-display mt-2 text-background tracking-wide" style={{ fontWeight: 300 }}>{hotel.name}</h2>
-          <div className="w-12 h-px mx-auto mt-3 mb-5" style={{ background: "hsl(var(--gold) / 0.4)" }} />
-          <p className="text-background/30 font-body max-w-sm mx-auto text-sm" style={{ fontWeight: 300 }}>
+          <SectionHeader
+            eyebrow="Ready to Experience"
+            title={hotel.name}
+            tone="light"
+            className="mb-2"
+          />
+          <p className="text-background/40 font-body max-w-sm mx-auto text-sm mt-3" style={{ fontWeight: 300 }}>
             Reserve your stay and discover unparalleled luxury.
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-4 mt-6">
-            <a href="tel:+919031027961" className="px-7 py-2.5 bg-primary text-primary-foreground text-[9px] tracking-[0.25em] uppercase font-body rounded-full hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 inline-flex items-center gap-2" style={{ fontWeight: 400 }}>
-              <Phone className="w-3 h-3" /> Reserve Now
+          <div className="flex flex-wrap items-center justify-center gap-4 mt-7">
+            <a
+              href="#booking"
+              className="luxe-shimmer px-8 py-3 text-[10px] tracking-[0.28em] uppercase font-body inline-flex items-center gap-2 transition-all duration-300"
+              style={{ background: "hsl(var(--gold))", color: "hsl(var(--foreground))", fontWeight: 500 }}
+            >
+              Reserve Now <ArrowRight className="w-3 h-3" />
+            </a>
+            <a href="tel:+919031027961" className="px-7 py-3 text-[10px] tracking-[0.28em] uppercase font-body inline-flex items-center gap-2 text-background/70 hover:text-background transition-colors" style={{ border: "1px solid hsl(var(--background) / 0.25)", fontWeight: 400 }}>
+              <Phone className="w-3 h-3" /> +91 9031027961
             </a>
           </div>
         </FadeSection>
+
       </section>
 
       {/* Lightbox Modal */}

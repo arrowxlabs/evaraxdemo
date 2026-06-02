@@ -275,10 +275,18 @@ const HotelPage = () => {
           </div>
 
           <div className="hidden md:flex items-center gap-5">
-            {["About", "Experience", "Rooms", "Gallery", "Booking", "Amenities"].map((item) => (
+            {["About", "Experience", "Rooms", "Gallery", "Amenities"].map((item) => (
               <a key={item} href={`#${item.toLowerCase()}`} className="text-[9px] tracking-[0.12em] uppercase text-muted-foreground hover:text-primary transition-colors font-body" style={{ fontWeight: 300 }}>{item}</a>
             ))}
+            <a
+              href="#booking"
+              className="ml-2 px-4 py-1.5 text-[9px] tracking-[0.2em] uppercase font-body bg-foreground text-background hover:bg-foreground/85 transition-colors"
+              style={{ fontWeight: 400 }}
+            >
+              Reserve
+            </a>
           </div>
+
 
           <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden text-foreground">
             {menuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}

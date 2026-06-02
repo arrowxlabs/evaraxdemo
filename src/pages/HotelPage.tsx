@@ -694,17 +694,19 @@ const HotelPage = () => {
             {hotel.amenities.map((amenity, i) => (
               <motion.div
                 key={i}
-                className="flex flex-col items-center gap-1.5 p-3 md:p-4 glass-card rounded-lg hover-gold-border text-center transition-all duration-300"
+                className="flex flex-col items-center gap-1.5 p-3 md:p-4 glass-card rounded-lg hover-gold-border luxe-fog text-center transition-all duration-300"
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.04, duration: 0.4 }}
+                whileHover={{ y: -3 }}
               >
-                <div className="text-primary/60">
+                <div className="text-primary/60 transition-transform duration-300 group-hover:scale-110">
                   {amenityIcons[amenity] || <Wifi className="w-4 h-4" />}
                 </div>
                 <span className="text-[9px] sm:text-[10px] text-muted-foreground font-body" style={{ fontWeight: 300 }}>{amenity}</span>
               </motion.div>
+
             ))}
           </div>
         </section>

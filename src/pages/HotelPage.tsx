@@ -261,94 +261,105 @@ const HotelPage = () => {
         </AnimatePresence>
       </nav>
 
-      {/* ===== CINEMATIC HERO — Aman / Rosewood style full-bleed ===== */}
-      <section ref={heroRef} className="relative h-[88vh] md:h-screen w-full overflow-hidden">
-        <motion.div className="absolute inset-0" style={{ y: heroY }}>
-          <img
-            src={hotel.heroImage}
-            alt={hotel.name}
-            className="w-full h-[115%] object-cover"
-            loading="eager"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/75" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/35 via-transparent to-transparent" />
-        </motion.div>
+      {/* ===== EDITORIAL HERO — responsive split layout ===== */}
+      <section ref={heroRef} className="relative w-full overflow-hidden bg-background pt-16 md:pt-20">
+        {/* Subtle gold pattern wash */}
+        <div className="absolute inset-0 pointer-events-none opacity-[0.04]" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 30L30 60L0 30Z' fill='none' stroke='%23B8860B' stroke-width='0.5'/%3E%3C/svg%3E")`,
+          backgroundSize: '60px 60px',
+        }} />
 
-        <motion.div
-          className="absolute inset-x-0 bottom-0 z-10 px-5 sm:px-8 md:px-14 pb-14 md:pb-24"
-          style={{ opacity: heroOpacity }}
-        >
-          <div className="max-w-7xl mx-auto">
+        <div className="relative max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-8 sm:py-12 lg:py-16">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+            {/* Image — portrait shown in full, never cropped */}
             <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.1, delay: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
-              className="max-w-2xl"
+              className="lg:col-span-7 order-1 relative"
+              initial={{ opacity: 0, scale: 0.97 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1.1, ease: [0.25, 0.1, 0.25, 1] }}
             >
-              <div className="flex items-center gap-3 mb-4">
+              <div className="relative w-full mx-auto" style={{ maxWidth: "min(100%, 640px)" }}>
+                {/* Gold frame accents */}
+                <div className="absolute -inset-2 sm:-inset-3 border border-[hsl(var(--gold)/0.35)] pointer-events-none" />
+                <div className="absolute -top-3 -left-3 w-8 h-8 sm:w-10 sm:h-10 border-l-2 border-t-2 border-[hsl(var(--gold))] pointer-events-none" />
+                <div className="absolute -bottom-3 -right-3 w-8 h-8 sm:w-10 sm:h-10 border-r-2 border-b-2 border-[hsl(var(--gold))] pointer-events-none" />
+
+                <motion.div className="relative overflow-hidden bg-[hsl(var(--muted))]" style={{ y: heroY }}>
+                  <img
+                    src={hotel.heroImage}
+                    alt={`${hotel.name} — facade`}
+                    className="block w-full h-auto object-cover object-center"
+                    style={{ aspectRatio: "4 / 5" }}
+                    loading="eager"
+                    decoding="async"
+                  />
+                  <div className="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-black/25 to-transparent pointer-events-none" />
+                </motion.div>
+
+                {/* Floating rating plate */}
+                <motion.div
+                  className="absolute -bottom-5 left-1/2 -translate-x-1/2 lg:left-auto lg:right-4 lg:translate-x-0 flex items-center gap-2 px-4 py-2 bg-background border border-[hsl(var(--gold)/0.4)] shadow-lg"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.8, duration: 0.6 }}
+                >
+                  {Array.from({ length: hotel.rating }).map((_, i) => (
+                    <Star key={i} className="w-3 h-3 fill-current" style={{ color: "hsl(var(--gold))" }} />
+                  ))}
+                  <span className="text-[9px] tracking-[0.3em] uppercase font-body text-muted-foreground ml-1" style={{ fontWeight: 400 }}>Est. 2024</span>
+                </motion.div>
+              </div>
+            </motion.div>
+
+            {/* Content */}
+            <motion.div
+              className="lg:col-span-5 order-2 text-center lg:text-left"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+            >
+              <div className="flex items-center justify-center lg:justify-start gap-3 mb-5">
                 <span className="h-px w-10" style={{ background: "hsl(var(--gold) / 0.75)" }} />
-                <span className="text-[10px] tracking-[0.45em] uppercase font-body" style={{ color: "hsl(var(--gold-light))", fontWeight: 400 }}>
+                <span className="text-[10px] tracking-[0.45em] uppercase font-body" style={{ color: "hsl(var(--gold))", fontWeight: 400 }}>
                   {hotel.tagline}
                 </span>
+                <span className="h-px w-10 lg:hidden" style={{ background: "hsl(var(--gold) / 0.75)" }} />
               </div>
 
               <h1
-                className="font-display text-white leading-[1.02] tracking-wide"
+                className="font-display text-foreground leading-[1.05] tracking-wide"
                 style={{
                   fontWeight: 300,
-                  fontSize: "clamp(2.5rem, 7vw, 5.5rem)",
-                  textShadow: "0 2px 30px rgba(0,0,0,0.4)",
+                  fontSize: "clamp(2.25rem, 6vw, 4.5rem)",
                 }}
               >
                 {hotel.name}
               </h1>
 
-              <div className="flex flex-wrap items-center gap-x-6 gap-y-3 mt-5 text-white/85">
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-3.5 h-3.5" style={{ color: "hsl(var(--gold-light))" }} />
-                  <span className="text-[11px] md:text-xs font-body tracking-wide" style={{ fontWeight: 300 }}>{hotel.address}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: hotel.rating }).map((_, i) => (
-                    <Star key={i} className="w-3 h-3 fill-current" style={{ color: "hsl(var(--gold-light))" }} />
-                  ))}
-                </div>
+              <div className="mt-5 flex items-start justify-center lg:justify-start gap-2 text-muted-foreground max-w-md mx-auto lg:mx-0">
+                <MapPin className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" style={{ color: "hsl(var(--gold))" }} />
+                <span className="text-[11px] sm:text-xs font-body tracking-wide leading-relaxed" style={{ fontWeight: 300 }}>
+                  {hotel.address}
+                </span>
               </div>
 
-              <div className="flex flex-wrap items-center gap-3 mt-8">
+              <p className="mt-6 text-sm sm:text-[15px] text-muted-foreground/90 leading-relaxed font-body max-w-md mx-auto lg:mx-0" style={{ fontWeight: 300 }}>
+                A boutique five-star retreat in the heart of Darbhanga, pairing modern elegance with warm Bihari hospitality.
+              </p>
+
+              <div className="mt-8 flex flex-wrap items-center justify-center lg:justify-start gap-3">
                 <a
                   href="#booking"
-                  className="px-7 py-3 text-[10px] tracking-[0.28em] uppercase font-body inline-flex items-center gap-2 transition-all duration-300 hover:opacity-90"
+                  className="luxe-shimmer px-7 py-3 text-[10px] tracking-[0.28em] uppercase font-body inline-flex items-center gap-2 transition-all duration-300 hover:opacity-90"
                   style={{ background: "hsl(var(--gold))", color: "hsl(var(--background))", fontWeight: 400 }}
                 >
                   Reserve a Stay <ArrowRight className="w-3 h-3" />
                 </a>
-                <a
-                  href="#about"
-                  className="px-7 py-3 text-[10px] tracking-[0.28em] uppercase font-body inline-flex items-center gap-2 text-white/90 hover:text-white transition-colors"
-                  style={{ fontWeight: 400, border: "1px solid rgba(255,255,255,0.28)" }}
-                >
-                  Discover
-                </a>
+                <a href="#about" className="btn-ghost-line">Discover</a>
               </div>
             </motion.div>
           </div>
-        </motion.div>
-
-        <motion.div
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.4, duration: 0.6 }}
-        >
-          <span className="text-[8px] tracking-[0.4em] uppercase text-white/60 font-body">Scroll</span>
-          <motion.span
-            className="h-8 w-px block"
-            style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.7), transparent)" }}
-            animate={{ scaleY: [0.4, 1, 0.4], opacity: [0.4, 1, 0.4] }}
-            transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
-          />
-        </motion.div>
+        </div>
       </section>
 
 

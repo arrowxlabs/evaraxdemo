@@ -1,4 +1,5 @@
-import hotelEvara from "@/assets/hotel-evara-new.jpg";
+import hotelEvaraAsset from "@/assets/hotel-evara-hero.png.asset.json";
+const hotelEvara = hotelEvaraAsset.url;
 import hotelDallan from "@/assets/dalaan-resort-new.jpg";
 import hotelExotica from "@/assets/hotel-exotica.jpg";
 

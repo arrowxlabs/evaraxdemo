@@ -19,6 +19,8 @@ import { cn } from "@/lib/utils";
 import constructionImg from "@/assets/construction-coming-soon.png";
 import SectionHeader from "@/components/SectionHeader";
 import ReserveFlow from "@/components/ReserveFlow";
+import evaraFacadeAsset from "@/assets/hotel-evara-facade.png.asset.json";
+const evaraFacade = evaraFacadeAsset.url;
 
 
 gsap.registerPlugin(ScrollTrigger);
@@ -108,17 +110,73 @@ const HotelPage = () => {
     );
   }
 
-  const isComingSoon = hotel.id === "evara-exotica";
+  const isComingSoon = hotel.id === "evara-exotica" || hotel.id === "dallan-resort";
 
   if (isComingSoon) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-background section-padding text-center">
-        <img src={constructionImg} alt="Under Construction" className="w-48 md:w-64 mb-6 opacity-70" />
-        <h1 className="text-2xl md:text-4xl font-display text-foreground" style={{ fontWeight: 300 }}>{hotel.name}</h1>
-        <p className="text-muted-foreground font-body mt-2 text-sm tracking-wider" style={{ fontWeight: 300 }}>Opening Soon</p>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background section-padding text-center overflow-hidden relative">
+        {/* Subtle gold pattern backdrop */}
+        <div className="absolute inset-0 pointer-events-none opacity-[0.04]" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 30L30 60L0 30Z' fill='none' stroke='%23B8860B' stroke-width='0.5'/%3E%3C/svg%3E")`,
+          backgroundSize: '60px 60px',
+        }} />
+
+        <motion.img
+          src={constructionImg}
+          alt="Under Construction"
+          className="w-56 md:w-80 mb-8 opacity-80 relative z-10"
+          initial={{ opacity: 0, scale: 0.92 }}
+          animate={{ opacity: 0.85, scale: 1, y: [0, -8, 0] }}
+          transition={{ opacity: { duration: 0.8 }, scale: { duration: 0.8 }, y: { duration: 4, repeat: Infinity, ease: "easeInOut" } }}
+        />
+
+        <div className="relative z-10 flex items-center gap-3 mb-4">
+          <span className="h-px w-10" style={{ background: "hsl(var(--gold) / 0.6)" }} />
+          <span className="text-[10px] tracking-[0.45em] uppercase font-body" style={{ color: "hsl(var(--gold))", fontWeight: 400 }}>Under Construction</span>
+          <span className="h-px w-10" style={{ background: "hsl(var(--gold) / 0.6)" }} />
+        </div>
+
+        <h1 className="text-3xl md:text-5xl font-display text-foreground relative z-10" style={{ fontWeight: 300 }}>{hotel.name}</h1>
+
+        {/* Animated shimmering Coming Soon */}
+        <div className="relative z-10 mt-5 overflow-hidden">
+          <motion.p
+            className="text-base md:text-xl font-display tracking-[0.4em] uppercase"
+            style={{
+              backgroundImage: "linear-gradient(90deg, hsl(var(--gold) / 0.4) 0%, hsl(var(--gold)) 50%, hsl(var(--gold) / 0.4) 100%)",
+              backgroundSize: "200% 100%",
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+              color: "transparent",
+              fontWeight: 400,
+            }}
+            animate={{ backgroundPosition: ["200% 0%", "-200% 0%"] }}
+            transition={{ duration: 3.5, repeat: Infinity, ease: "linear" }}
+          >
+            Coming Soon
+          </motion.p>
+        </div>
+
+        <motion.div
+          className="relative z-10 flex gap-1.5 mt-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+        >
+          {[0, 1, 2].map((i) => (
+            <motion.span
+              key={i}
+              className="w-1.5 h-1.5 rounded-full"
+              style={{ background: "hsl(var(--gold))" }}
+              animate={{ opacity: [0.2, 1, 0.2] }}
+              transition={{ duration: 1.4, repeat: Infinity, delay: i * 0.2, ease: "easeInOut" }}
+            />
+          ))}
+        </motion.div>
+
         <button
           onClick={() => navigateWithTransition("/")}
-          className="mt-8 group inline-flex items-center gap-2 border border-primary/30 text-primary px-7 py-2.5 text-[9px] tracking-[0.25em] uppercase font-body hover:bg-primary/5 hover:border-primary/50 transition-all duration-300 rounded-full"
+          className="relative z-10 mt-10 group inline-flex items-center gap-2 border border-primary/30 text-primary px-7 py-2.5 text-[9px] tracking-[0.25em] uppercase font-body hover:bg-primary/5 hover:border-primary/50 transition-all duration-300 rounded-full"
           style={{ fontWeight: 400 }}
         >
           Back to Home <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />

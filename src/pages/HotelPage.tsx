@@ -19,6 +19,8 @@ import { cn } from "@/lib/utils";
 import constructionImg from "@/assets/construction-coming-soon.png";
 import SectionHeader from "@/components/SectionHeader";
 import ReserveFlow from "@/components/ReserveFlow";
+import evaraFacadeAsset from "@/assets/hotel-evara-facade.png.asset.json";
+const evaraFacade = evaraFacadeAsset.url;
 
 
 gsap.registerPlugin(ScrollTrigger);
@@ -108,17 +110,73 @@ const HotelPage = () => {
     );
   }
 
-  const isComingSoon = hotel.id === "evara-exotica";
+  const isComingSoon = hotel.id === "evara-exotica" || hotel.id === "dallan-resort";
 
   if (isComingSoon) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-background section-padding text-center">
-        <img src={constructionImg} alt="Under Construction" className="w-48 md:w-64 mb-6 opacity-70" />
-        <h1 className="text-2xl md:text-4xl font-display text-foreground" style={{ fontWeight: 300 }}>{hotel.name}</h1>
-        <p className="text-muted-foreground font-body mt-2 text-sm tracking-wider" style={{ fontWeight: 300 }}>Opening Soon</p>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background section-padding text-center overflow-hidden relative">
+        {/* Subtle gold pattern backdrop */}
+        <div className="absolute inset-0 pointer-events-none opacity-[0.04]" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 30L30 60L0 30Z' fill='none' stroke='%23B8860B' stroke-width='0.5'/%3E%3C/svg%3E")`,
+          backgroundSize: '60px 60px',
+        }} />
+
+        <motion.img
+          src={constructionImg}
+          alt="Under Construction"
+          className="w-56 md:w-80 mb-8 opacity-80 relative z-10"
+          initial={{ opacity: 0, scale: 0.92 }}
+          animate={{ opacity: 0.85, scale: 1, y: [0, -8, 0] }}
+          transition={{ opacity: { duration: 0.8 }, scale: { duration: 0.8 }, y: { duration: 4, repeat: Infinity, ease: "easeInOut" } }}
+        />
+
+        <div className="relative z-10 flex items-center gap-3 mb-4">
+          <span className="h-px w-10" style={{ background: "hsl(var(--gold) / 0.6)" }} />
+          <span className="text-[10px] tracking-[0.45em] uppercase font-body" style={{ color: "hsl(var(--gold))", fontWeight: 400 }}>Under Construction</span>
+          <span className="h-px w-10" style={{ background: "hsl(var(--gold) / 0.6)" }} />
+        </div>
+
+        <h1 className="text-3xl md:text-5xl font-display text-foreground relative z-10" style={{ fontWeight: 300 }}>{hotel.name}</h1>
+
+        {/* Animated shimmering Coming Soon */}
+        <div className="relative z-10 mt-5 overflow-hidden">
+          <motion.p
+            className="text-base md:text-xl font-display tracking-[0.4em] uppercase"
+            style={{
+              backgroundImage: "linear-gradient(90deg, hsl(var(--gold) / 0.4) 0%, hsl(var(--gold)) 50%, hsl(var(--gold) / 0.4) 100%)",
+              backgroundSize: "200% 100%",
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+              color: "transparent",
+              fontWeight: 400,
+            }}
+            animate={{ backgroundPosition: ["200% 0%", "-200% 0%"] }}
+            transition={{ duration: 3.5, repeat: Infinity, ease: "linear" }}
+          >
+            Coming Soon
+          </motion.p>
+        </div>
+
+        <motion.div
+          className="relative z-10 flex gap-1.5 mt-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+        >
+          {[0, 1, 2].map((i) => (
+            <motion.span
+              key={i}
+              className="w-1.5 h-1.5 rounded-full"
+              style={{ background: "hsl(var(--gold))" }}
+              animate={{ opacity: [0.2, 1, 0.2] }}
+              transition={{ duration: 1.4, repeat: Infinity, delay: i * 0.2, ease: "easeInOut" }}
+            />
+          ))}
+        </motion.div>
+
         <button
           onClick={() => navigateWithTransition("/")}
-          className="mt-8 group inline-flex items-center gap-2 border border-primary/30 text-primary px-7 py-2.5 text-[9px] tracking-[0.25em] uppercase font-body hover:bg-primary/5 hover:border-primary/50 transition-all duration-300 rounded-full"
+          className="relative z-10 mt-10 group inline-flex items-center gap-2 border border-primary/30 text-primary px-7 py-2.5 text-[9px] tracking-[0.25em] uppercase font-body hover:bg-primary/5 hover:border-primary/50 transition-all duration-300 rounded-full"
           style={{ fontWeight: 400 }}
         >
           Back to Home <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
@@ -294,51 +352,118 @@ const HotelPage = () => {
       </section>
 
 
-      {/* About with elegant layout */}
+      {/* About — editorial split layout with facade portrait */}
       <FadeSection>
-        <section id="about" className="section-padding max-w-4xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-14 items-center">
-            <div>
-              <span className="text-[9px] tracking-[0.3em] uppercase text-primary/50 font-body" style={{ fontWeight: 300 }}>Welcome to</span>
-              <h2 className="text-xl sm:text-2xl md:text-4xl font-display mt-2 text-foreground tracking-wide" style={{ fontWeight: 300 }}>{hotel.name}</h2>
-              <div className="w-12 h-px mt-3 mb-5" style={{ background: "hsl(var(--gold) / 0.4)" }} />
-              <p className="text-muted-foreground font-body leading-relaxed text-sm" style={{ fontWeight: 300 }}>{hotel.description}</p>
-              <div className="flex flex-wrap gap-6 mt-6">
+        <section id="about" className="section-padding">
+          <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
+            {/* Facade image — tall portrait, the hero of this section */}
+            <div className="lg:col-span-5 relative order-2 lg:order-1">
+              <motion.div
+                className="relative overflow-hidden rounded-md"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1] }}
+              >
+                <div className="aspect-[3/4] w-full overflow-hidden">
+                  <img
+                    src={hotel.id === "evara" ? evaraFacade : (hotel.gallery[0] || hotel.heroImage)}
+                    alt={`${hotel.name} facade`}
+                    className="w-full h-full object-cover transition-transform duration-[1500ms] hover:scale-105"
+                    loading="lazy"
+                  />
+                </div>
+                {/* Gold corner frame accents */}
+                <span className="absolute top-3 left-3 w-6 h-6 border-t border-l" style={{ borderColor: "hsl(var(--gold) / 0.6)" }} />
+                <span className="absolute top-3 right-3 w-6 h-6 border-t border-r" style={{ borderColor: "hsl(var(--gold) / 0.6)" }} />
+                <span className="absolute bottom-3 left-3 w-6 h-6 border-b border-l" style={{ borderColor: "hsl(var(--gold) / 0.6)" }} />
+                <span className="absolute bottom-3 right-3 w-6 h-6 border-b border-r" style={{ borderColor: "hsl(var(--gold) / 0.6)" }} />
+              </motion.div>
+
+              {/* Floating Est. plate */}
+              <motion.div
+                className="hidden md:flex absolute -bottom-6 -right-6 lg:-right-10 bg-background px-5 py-4 shadow-2xl flex-col items-center"
+                style={{ border: "1px solid hsl(var(--gold) / 0.25)" }}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.7, delay: 0.4 }}
+              >
+                <span className="text-[8px] tracking-[0.4em] uppercase text-muted-foreground/70 font-body">Established</span>
+                <span className="text-2xl font-display mt-1" style={{ fontWeight: 300, color: "hsl(var(--gold))" }}>2024</span>
+                <div className="flex items-center gap-1 mt-1">
+                  {Array.from({ length: hotel.rating }).map((_, i) => (
+                    <Star key={i} className="w-2.5 h-2.5 fill-current" style={{ color: "hsl(var(--gold))" }} />
+                  ))}
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Copy column */}
+            <div className="lg:col-span-7 order-1 lg:order-2">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="h-px w-10" style={{ background: "hsl(var(--gold) / 0.7)" }} />
+                <span className="text-[10px] tracking-[0.45em] uppercase font-body" style={{ color: "hsl(var(--gold))", fontWeight: 400 }}>
+                  Welcome to
+                </span>
+              </div>
+
+              <h2
+                className="font-display text-foreground leading-[1.05] tracking-wide"
+                style={{ fontWeight: 300, fontSize: "clamp(2rem, 5vw, 3.5rem)" }}
+              >
+                {hotel.name}
+                <span className="block italic mt-1" style={{ color: "hsl(var(--gold))", fontWeight: 300 }}>
+                  Stay · Dine · Celebrate
+                </span>
+              </h2>
+
+              <div className="w-16 h-px my-6" style={{ background: "hsl(var(--gold) / 0.5)" }} />
+
+              <p className="text-muted-foreground font-body leading-[1.85] text-[15px] max-w-xl" style={{ fontWeight: 300 }}>
+                {hotel.description}
+              </p>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-5 mt-9 max-w-xl">
                 {[
                   { icon: Wifi, label: "High-Speed WiFi", value: "Complimentary" },
                   { icon: Car, label: "Valet Parking", value: "Available" },
-                  { icon: Phone, label: "Reservations", value: "24/7" },
+                  { icon: Phone, label: "Concierge", value: "24 / 7" },
                 ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: "hsl(var(--gold) / 0.08)", border: "1px solid hsl(var(--gold) / 0.15)" }}>
+                  <div key={i} className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ background: "hsl(var(--gold) / 0.08)", border: "1px solid hsl(var(--gold) / 0.2)" }}>
                       <item.icon className="w-3.5 h-3.5" style={{ color: "hsl(var(--gold))" }} />
                     </div>
-                    <div>
-                      <span className="text-[8px] tracking-wider uppercase text-muted-foreground/50 font-body block">{item.label}</span>
-                      <span className="text-xs font-body text-foreground" style={{ fontWeight: 400 }}>{item.value}</span>
+                    <div className="min-w-0">
+                      <span className="text-[8px] tracking-[0.25em] uppercase text-muted-foreground/60 font-body block">{item.label}</span>
+                      <span className="text-xs font-body text-foreground block mt-0.5" style={{ fontWeight: 400 }}>{item.value}</span>
                     </div>
                   </div>
                 ))}
               </div>
-            </div>
-            <div className="relative">
-              <ParallaxImage src={hotel.gallery[0] || hotel.heroImage} alt={hotel.name} className="rounded-2xl aspect-[3/4]" />
-              {/* Floating accent card */}
-              <div className="absolute -bottom-4 -left-4 md:-left-6 bg-background rounded-xl p-4 shadow-xl" style={{ border: "1px solid hsl(var(--border) / 0.3)" }}>
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: "hsl(var(--gold) / 0.15)" }}>
-                    <Star className="w-4 h-4 fill-current" style={{ color: "hsl(var(--gold))" }} />
-                  </div>
-                  <div>
-                    <span className="text-lg font-display text-foreground" style={{ fontWeight: 400 }}>{hotel.rating}.0</span>
-                    <span className="text-[8px] text-muted-foreground block tracking-wider uppercase">Premium</span>
-                  </div>
-                </div>
+
+              <div className="flex flex-wrap items-center gap-4 mt-9">
+                <a
+                  href="#booking"
+                  className="px-7 py-3 text-[10px] tracking-[0.28em] uppercase font-body inline-flex items-center gap-2 transition-all duration-300 hover:opacity-90"
+                  style={{ background: "hsl(var(--gold))", color: "hsl(var(--background))", fontWeight: 400 }}
+                >
+                  Reserve a Stay <ArrowRight className="w-3 h-3" />
+                </a>
+                <a
+                  href="#experience"
+                  className="text-[10px] tracking-[0.28em] uppercase font-body inline-flex items-center gap-2 text-foreground/80 hover:text-primary transition-colors"
+                  style={{ fontWeight: 400 }}
+                >
+                  Explore Experiences <ArrowUpRight className="w-3 h-3" />
+                </a>
               </div>
             </div>
           </div>
         </section>
       </FadeSection>
+
+
 
       {/* Highlights */}
       <section id="experience" className="bg-secondary">

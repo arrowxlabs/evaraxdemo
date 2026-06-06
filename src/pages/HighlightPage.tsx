@@ -2,7 +2,11 @@ import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { hotels } from "@/data/hotels";
+import { galleryLoopVideo } from "@/data/hotels";
+import { useGallery } from "@/hooks/useHotelMedia";
+import MediaGallery from "@/components/MediaGallery";
 import { ArrowLeft, Phone, Mail, Clock, Users, Star } from "lucide-react";
+
 
 const highlightDetails: Record<string, {
   hours?: string;
@@ -78,6 +82,8 @@ const HighlightPage = () => {
   }
 
   const details = highlightDetails[highlight.title];
+  const gallery = useGallery(id || "", `highlight-${highlight.key || highlightSlug}-gallery`, highlight.gallery || [highlight.image], galleryLoopVideo);
+
 
   return (
     <div className="min-h-screen bg-background text-foreground font-body">
@@ -175,7 +181,19 @@ const HighlightPage = () => {
             <p className="text-sm text-muted-foreground font-body leading-relaxed" style={{ fontWeight: 300 }}>{highlight.description}</p>
           </div>
         )}
+
+        {/* Professional Media Gallery — video first, then photos */}
+        <motion.div
+          className="mt-14"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <MediaGallery items={gallery} title="Gallery" />
+        </motion.div>
       </section>
+
 
       {/* CTA */}
       <section className="section-padding text-center" style={{ background: "hsl(var(--foreground))" }}>

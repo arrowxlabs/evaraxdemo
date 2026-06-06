@@ -8,7 +8,7 @@ import EvaraGifTransition from "@/components/EvaraGifTransition";
 import LuxuryOrnament from "@/components/LuxuryOrnament";
 
 // Staggered card component with scroll-triggered animation
-const HotelCard = ({ hotel, index, onClickHotel }: { hotel: typeof hotels[0]; index: number; onClickHotel: (hotel: typeof hotels[0], rect: DOMRect) => void }) => {
+const HotelCard = ({ hotel, index, onClickHotel, onHoverHotel }: { hotel: typeof hotels[0]; index: number; onClickHotel: (hotel: typeof hotels[0], rect: DOMRect) => void; onHoverHotel: (hotelId: string) => void }) => {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-80px" });
 
@@ -19,6 +19,8 @@ const HotelCard = ({ hotel, index, onClickHotel }: { hotel: typeof hotels[0]; in
       initial={{ opacity: 0, y: 60 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.8, delay: index * 0.15, ease: [0.25, 0.1, 0.25, 1] }}
+      onMouseEnter={() => onHoverHotel(hotel.id)}
+      onTouchStart={() => onHoverHotel(hotel.id)}
       onClick={() => {
         if (ref.current) {
           const imgEl = ref.current.querySelector("img");

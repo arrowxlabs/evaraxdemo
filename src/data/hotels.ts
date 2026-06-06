@@ -2,6 +2,8 @@ import hotelEvaraAsset from "@/assets/hotel-evara-hero.png.asset.json";
 const hotelEvara = hotelEvaraAsset.url;
 import hotelDallan from "@/assets/dalaan-resort-new.jpg";
 import hotelExotica from "@/assets/hotel-exotica.jpg";
+import galleryVideoAsset from "@/assets/gallery-hotel-loop.mp4.asset.json";
+export const galleryLoopVideo = galleryVideoAsset.url;
 
 import roomDeluxe from "@/assets/room-deluxe.jpg";
 import roomSuite from "@/assets/room-suite.jpg";
@@ -17,17 +19,24 @@ import deluxeRoom from "@/assets/deluxe-room.jpg";
 import mandapBanquet from "@/assets/mandap-banquet.jpg";
 
 export interface HotelRoom {
+  key: string;
   name: string;
   description: string;
   price: string;
+  singlePrice?: string;
+  doublePrice?: string;
   image: string;
   features: string[];
+  amenities?: string[];
+  gallery?: string[];
 }
 
 export interface HotelHighlight {
+  key: string;
   title: string;
   description: string;
   image: string;
+  gallery?: string[];
 }
 
 export interface HotelData {
@@ -46,6 +55,17 @@ export interface HotelData {
   highlights: HotelHighlight[];
 }
 
+const defaultRoomAmenities = [
+  "King-Size Bed",
+  "Air Conditioning",
+  "Complimentary Wi-Fi",
+  "Smart LED TV",
+  "Tea & Coffee Maker",
+  "24/7 Room Service",
+  "Premium Linens",
+  "Daily Housekeeping",
+];
+
 export const hotels: HotelData[] = [
   {
     id: "evara",
@@ -60,49 +80,106 @@ export const hotels: HotelData[] = [
     rating: 5,
     rooms: [
       {
-        name: "Twin Deluxe Room",
-        description: "Elegant twin deluxe room designed for comfort and style. Available in 5 rooms.",
-        price: "₹2,999",
-        image: twinDeluxeRoom,
-        features: ["Twin Beds", "AC", "Free Wi-Fi", "Single: ₹2999 / Double: ₹3799"],
+        key: "premium",
+        name: "Premium Room",
+        description:
+          "Our signature accommodation — spacious interiors, hand-finished textiles, and curated artwork. A serene retreat with city views and bespoke turn-down service.",
+        price: "₹4,499",
+        singlePrice: "₹4,499",
+        doublePrice: "₹4,999",
+        image: roomDeluxePremium,
+        features: ["King Bed", "City View", "Mini Bar", "Bathtub"],
+        amenities: defaultRoomAmenities.concat(["Marble Bathroom", "Bathtub", "Mini Bar", "City View"]),
+        gallery: [roomDeluxePremium, suiteRoom, deluxeRoom],
       },
       {
+        key: "deluxe",
         name: "Deluxe Room",
-        description: "Our most popular room category with 13 rooms, offering premium comfort and amenities.",
+        description:
+          "Our most popular category — refined comfort with all modern essentials. Thirteen rooms thoughtfully composed for an unhurried stay.",
         price: "₹2,999",
+        singlePrice: "₹2,999",
+        doublePrice: "₹3,799",
         image: deluxeRoom,
-        features: ["King Bed", "AC", "Free Wi-Fi", "Single: ₹2999 / Double: ₹3799"],
+        features: ["King Bed", "AC", "Free Wi-Fi", "Smart TV"],
+        amenities: defaultRoomAmenities,
+        gallery: [deluxeRoom, roomDeluxePremium, twinDeluxeRoom],
       },
       {
+        key: "executive",
+        name: "Executive Room",
+        description:
+          "Designed for the business traveller — a dedicated workspace, ergonomic seating, and quiet ambient lighting paired with our signature comfort.",
+        price: "₹3,499",
+        singlePrice: "₹3,499",
+        doublePrice: "₹3,999",
+        image: roomDeluxePremium,
+        features: ["Work Desk", "King Bed", "Premium Wi-Fi", "Coffee Station"],
+        amenities: defaultRoomAmenities.concat(["Executive Work Desk", "Premium Wi-Fi", "Express Laundry"]),
+        gallery: [roomDeluxePremium, deluxeRoom, suiteRoom],
+      },
+      {
+        key: "twin-deluxe",
+        name: "Twin Deluxe Room",
+        description:
+          "Elegantly composed twin-bedded room — ideal for friends, family, or colleagues travelling together. Five rooms available.",
+        price: "₹2,999",
+        singlePrice: "₹2,999",
+        doublePrice: "₹3,799",
+        image: twinDeluxeRoom,
+        features: ["Twin Beds", "AC", "Free Wi-Fi", "Smart TV"],
+        amenities: defaultRoomAmenities,
+        gallery: [twinDeluxeRoom, deluxeRoom, roomDeluxe],
+      },
+      {
+        key: "suite",
         name: "Suite Room",
-        description: "Luxurious suite rooms for an elevated stay experience. Available in 4 exclusive rooms.",
+        description:
+          "Our most luxurious accommodation — a generous suite with a separate sitting area, premium fixtures, and unrivalled comfort. Four exclusive rooms.",
         price: "₹3,999",
+        singlePrice: "₹3,999",
+        doublePrice: "₹4,499",
         image: suiteRoom,
-        features: ["Premium Suite", "AC", "Free Wi-Fi", "Single: ₹3999 / Double: ₹4499"],
+        features: ["Suite Lounge", "King Bed", "Mini Bar", "Premium Bath"],
+        amenities: defaultRoomAmenities.concat(["Separate Sitting Area", "Mini Bar", "Bathtub", "Premium Bath Amenities"]),
+        gallery: [suiteRoom, roomDeluxePremium, mandapBanquet],
       },
     ],
-    amenities: ["CHAUKAA Restaurant", "Open Rooftop Dining", "Mandap Banquet Hall", "Conference Hall", "Free Wi-Fi", "Free Parking", "UPI & Card Payment", "Room Service"],
+    amenities: [
+      "CHAUKAA Restaurant",
+      "Mandap Banquet Hall",
+      "Conference Hall",
+      "Free Wi-Fi",
+      "Free Parking",
+      "UPI & Card Payment",
+      "Room Service",
+      "Concierge",
+    ],
     gallery: [hotelEvara, twinDeluxeRoom, suiteRoom, deluxeRoom, mandapBanquet, hotelRestaurant],
     highlights: [
       {
+        key: "chaukaa-restaurant",
         title: "CHAUKAA Restaurant",
-        description: "Perfect for family dining, casual meetups & small celebrations. Our multi-cuisine restaurant seats 50 guests in a warm, inviting atmosphere with carefully crafted dishes.",
+        description:
+          "Perfect for family dining, casual meetups & small celebrations. Our multi-cuisine restaurant seats 50 guests in a warm, inviting atmosphere with carefully crafted dishes.",
         image: hotelRestaurant,
+        gallery: [hotelRestaurant, hotelDining, hotelEvara, mandapBanquet],
       },
       {
+        key: "mandap-banquet-hall",
         title: "Mandap Banquet Hall",
-        description: "Host your dream events — weddings, engagements, birthday parties, and corporate events in our spacious and elegantly designed banquet hall.",
+        description:
+          "Host your dream events — weddings, engagements, birthday parties, and corporate events in our spacious and elegantly designed banquet hall.",
         image: mandapBanquet,
+        gallery: [mandapBanquet, hotelBanquet, hotelRestaurant, hotelEvara],
       },
       {
-        title: "Open Rooftop Dining",
-        description: "Experience dining under the stars at our open rooftop space. Ideal for evening dining, private gatherings, and small celebrations with a stunning ambiance.",
-        image: hotelRooftop,
-      },
-      {
+        key: "rooms-suites",
         title: "Comfortable Rooms & Suites",
-        description: "Choose from Twin Deluxe, Deluxe, and Suite rooms — each designed for a restful stay with modern amenities. Check-in at 12:00 Noon, Check-out at 11:00 AM.",
+        description:
+          "Choose from Premium, Deluxe, Executive, Twin Deluxe, and Suite rooms — each designed for a restful stay with modern amenities. Check-in at 12:00 Noon, Check-out at 11:00 AM.",
         image: suiteRoom,
+        gallery: [suiteRoom, deluxeRoom, twinDeluxeRoom, roomDeluxePremium],
       },
     ],
   },
@@ -112,58 +189,14 @@ export const hotels: HotelData[] = [
     tagline: "Nature • Luxury • Peace",
     address: "Shukla Nagar, Sonki Chikni, Darbhanga, Bihar",
     city: "India",
-    description:
-      "Dalaan Resort offers a premium and peaceful environment designed for luxury stays, weddings, and large-scale social or corporate events. The property blends nature with modern amenities, making it an ideal destination for celebrations and relaxation.",
+    description: "Opening Soon",
     heroImage: hotelDallan,
     cardImage: hotelDallan,
     rating: 5,
-    rooms: [
-      {
-        name: "Luxury Room",
-        description: "Premium luxury rooms designed with modern comforts and elegant interiors for an unforgettable stay.",
-        price: "Contact",
-        image: roomDeluxePremium,
-        features: ["AC", "Free Wi-Fi", "Room Service", "Premium Amenities"],
-      },
-      {
-        name: "Villa Room",
-        description: "Exclusive villa rooms located in the Mithila Lawn area, surrounded by nature and tranquility.",
-        price: "Contact",
-        image: roomSuite,
-        features: ["Private Space", "Lawn View", "AC", "Premium Interiors"],
-      },
-      {
-        name: "Bridal & Groom Suite",
-        description: "Specially designed preparation rooms for brides and grooms, ensuring your special day begins perfectly.",
-        price: "Contact",
-        image: roomDeluxe,
-        features: ["Preparation Room", "Private Space", "Premium Décor", "AC"],
-      },
-    ],
-    amenities: ["Multi-Cuisine Restaurant", "Coffee Shop", "Swimming Pool", "Spa & Salon", "Banquet Halls", "Open Lawns (4 Spaces)", "Club House", "Rain Dance Area", "Kids Zone", "Table Tennis / Snooker", "Car Parking", "Free Wi-Fi"],
-    gallery: [hotelDallan, roomSuite, hotelDining, hotelSpa, hotelRooftop, hotelRestaurant],
-    highlights: [
-      {
-        title: "Multi-Cuisine Restaurant",
-        description: "Savor a wide variety of cuisines at our in-house restaurant. From traditional dishes to contemporary flavors, every meal is a delightful experience.",
-        image: hotelRestaurant,
-      },
-      {
-        title: "Banquet Halls & Open Lawns",
-        description: "Host destination weddings, corporate events, family functions, and grand celebrations across our elegant banquet halls and 4 beautiful open lawn spaces with fountain areas.",
-        image: hotelBanquet,
-      },
-      {
-        title: "Club House & Leisure",
-        description: "Enjoy our swimming pool, rain dance area, spa & salon, kids zone, and indoor games including table tennis and snooker — perfect for relaxation and fun.",
-        image: hotelRooftop,
-      },
-      {
-        title: "Luxury Stays & Villas",
-        description: "Experience premium comfort in our luxury rooms and exclusive villa rooms nestled in the Mithila Lawn area. Each room blends nature with modern elegance for an extraordinary stay.",
-        image: roomDeluxePremium,
-      },
-    ],
+    rooms: [],
+    amenities: [],
+    gallery: [],
+    highlights: [],
   },
   {
     id: "evara-exotica",

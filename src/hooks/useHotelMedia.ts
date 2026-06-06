@@ -98,3 +98,24 @@ export function useRoomPrice(hotelId: string, roomKey: string, fallback: { singl
   }, [hotelId, roomKey]);
   return price;
 }
+
+/** Returns first media URL for a section, or fallback. */
+export function useMediaUrl(hotelId: string, sectionKey: string, fallback: string): string {
+  const { items } = useHotelMedia(hotelId, sectionKey);
+  return items[0]?.url || fallback;
+}
+
+/** Returns a MediaItem[] (videos first, then by sort), or builds from fallback images. */
+export function useGallery(hotelId: string, sectionKey: string, fallbackImages: string[] = [], fallbackVideo?: string): MediaItem[] {
+  const { items } = useHotelMedia(hotelId, sectionKey);
+  if (items.length > 0) return items;
+  const out: MediaItem[] = [];
+  if (fallbackVideo) {
+    out.push({ id: "fb-video", type: "video", url: fallbackVideo, sort_order: -1 });
+  }
+  fallbackImages.forEach((url, i) => {
+    out.push({ id: `fb-${i}`, type: "image", url, sort_order: i });
+  });
+  return out;
+}
+

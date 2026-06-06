@@ -14,13 +14,88 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      admins: {
+        Row: {
+          created_at: string
+          email: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      hotel_media: {
+        Row: {
+          created_at: string
+          hotel_id: string
+          id: string
+          media_type: string
+          section_key: string
+          sort_order: number
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          hotel_id: string
+          id?: string
+          media_type: string
+          section_key: string
+          sort_order?: number
+          url: string
+        }
+        Update: {
+          created_at?: string
+          hotel_id?: string
+          id?: string
+          media_type?: string
+          section_key?: string
+          sort_order?: number
+          url?: string
+        }
+        Relationships: []
+      }
+      room_pricing: {
+        Row: {
+          display_price: string | null
+          double_price: string | null
+          hotel_id: string
+          room_key: string
+          single_price: string | null
+          updated_at: string
+        }
+        Insert: {
+          display_price?: string | null
+          double_price?: string | null
+          hotel_id: string
+          room_key: string
+          single_price?: string | null
+          updated_at?: string
+        }
+        Update: {
+          display_price?: string | null
+          double_price?: string | null
+          hotel_id?: string
+          room_key?: string
+          single_price?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      claim_admin: { Args: never; Returns: boolean }
+      is_admin: { Args: { _uid: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never

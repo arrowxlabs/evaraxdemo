@@ -19,6 +19,10 @@ import { cn } from "@/lib/utils";
 import constructionImg from "@/assets/construction-coming-soon.png";
 import SectionHeader from "@/components/SectionHeader";
 import ReserveFlow from "@/components/ReserveFlow";
+import MediaGallery from "@/components/MediaGallery";
+import LoopVideo from "@/components/LoopVideo";
+import { useGallery, useRoomPrice } from "@/hooks/useHotelMedia";
+import { galleryLoopVideo } from "@/data/hotels";
 import evaraFacadeAsset from "@/assets/hotel-evara-facade.png.asset.json";
 const evaraFacade = evaraFacadeAsset.url;
 
@@ -84,6 +88,86 @@ const ParallaxImage = ({ src, alt, className }: { src: string; alt: string; clas
 };
 
 // (Legacy single-step BookingForm replaced by multi-step <ReserveFlow />)
+
+// Per-room editorial section: title, image, description, amenities, gallery, pricing, reserve
+const RoomSection = ({ hotelId, room, index }: { hotelId: string; room: any; index: number }) => {
+  const gallery = useGallery(hotelId, `room-${room.key}-gallery`, room.gallery || [room.image], galleryLoopVideo);
+  const mainImageItems = useGallery(hotelId, `room-${room.key}-main`, [room.image]);
+  const mainImage = mainImageItems[0]?.url || room.image;
+  const price = useRoomPrice(hotelId, room.key, { single: room.singlePrice, double: room.doublePrice, display: room.price });
+  const reverse = index % 2 === 1;
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
+    >
+      {/* Title + index */}
+      <div className="flex items-baseline gap-4 mb-6">
+        <span className="text-3xl md:text-4xl font-display" style={{ color: "hsl(var(--gold))", fontWeight: 300 }}>
+          0{index + 1}
+        </span>
+        <div className="flex-1 min-w-0">
+          <span className="text-[10px] tracking-[0.45em] uppercase font-body text-muted-foreground" style={{ fontWeight: 400 }}>Residence</span>
+          <h3 className="text-2xl md:text-4xl font-display tracking-wide text-foreground" style={{ fontWeight: 400 }}>{room.name}</h3>
+        </div>
+        <div className="hidden sm:block h-px flex-1 max-w-[120px]" style={{ background: "hsl(var(--gold) / 0.4)" }} />
+      </div>
+
+      {/* Image + copy split */}
+      <div className={`grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center ${reverse ? 'lg:[&>*:first-child]:order-2' : ''}`}>
+        <div className="lg:col-span-7 relative">
+          <div className="relative overflow-hidden rounded-2xl shadow-xl">
+            <img src={mainImage} alt={room.name} className="w-full aspect-[4/3] object-cover" loading="lazy" />
+            <span className="absolute top-3 left-3 w-8 h-8 border-t-2 border-l-2 pointer-events-none" style={{ borderColor: "hsl(var(--gold) / 0.7)" }} />
+            <span className="absolute bottom-3 right-3 w-8 h-8 border-b-2 border-r-2 pointer-events-none" style={{ borderColor: "hsl(var(--gold) / 0.7)" }} />
+          </div>
+        </div>
+        <div className="lg:col-span-5">
+          <p className="text-[15px] text-muted-foreground leading-[1.85] font-body" style={{ fontWeight: 300 }}>{room.description}</p>
+
+          {/* Amenities */}
+          <div className="mt-6">
+            <span className="text-[9px] tracking-[0.4em] uppercase text-muted-foreground font-body">Amenities</span>
+            <div className="flex flex-wrap gap-2 mt-3">
+              {(room.amenities || room.features).map((a: string) => (
+                <span key={a} className="text-[10px] px-3 py-1.5 rounded-full font-body tracking-wide" style={{ background: "hsl(var(--gold) / 0.08)", color: "hsl(var(--foreground))", border: "1px solid hsl(var(--gold) / 0.18)" }}>
+                  {a}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Pricing */}
+          <div className="mt-7 grid grid-cols-2 gap-3">
+            <div className="p-4 rounded-xl" style={{ background: "hsl(var(--secondary))", border: "1px solid hsl(var(--border))" }}>
+              <span className="text-[9px] tracking-[0.3em] uppercase text-muted-foreground font-body block">Single</span>
+              <span className="text-xl font-display text-foreground mt-1 block" style={{ fontWeight: 500 }}>{price.single || price.display}</span>
+              <span className="text-[9px] text-muted-foreground/60 font-body">/night</span>
+            </div>
+            <div className="p-4 rounded-xl" style={{ background: "hsl(var(--gold) / 0.08)", border: "1px solid hsl(var(--gold) / 0.3)" }}>
+              <span className="text-[9px] tracking-[0.3em] uppercase font-body block" style={{ color: "hsl(var(--gold))" }}>Double</span>
+              <span className="text-xl font-display mt-1 block" style={{ fontWeight: 500, color: "hsl(var(--gold))" }}>{price.double || price.display}</span>
+              <span className="text-[9px] text-muted-foreground/60 font-body">/night</span>
+            </div>
+          </div>
+
+          <a href="#booking" className="luxe-shimmer mt-6 inline-flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-3 text-[10px] tracking-[0.28em] uppercase font-body" style={{ background: "hsl(var(--gold))", color: "hsl(var(--background))", fontWeight: 400 }}>
+            Reserve {room.name} <ArrowRight className="w-3 h-3" />
+          </a>
+        </div>
+      </div>
+
+      {/* Gallery */}
+      <div className="mt-10">
+        <MediaGallery items={gallery} title={`${room.name} Gallery`} />
+      </div>
+    </motion.div>
+  );
+};
+
+
 
 
 const HotelPage = () => {
@@ -474,6 +558,23 @@ const HotelPage = () => {
         </section>
       </FadeSection>
 
+      {/* ===== Looping Cinematic Video (replaces old static picture after Explore Experiences) ===== */}
+      {hotel.id === "evara" && (
+        <FadeSection>
+          <section className="section-padding" style={{ background: "hsl(var(--background))" }}>
+            <div className="max-w-6xl mx-auto">
+              <SectionHeader eyebrow="A Glimpse Inside" title="Step Into" accent="Evara" className="mb-8" />
+              <div className="relative">
+                <LoopVideo src={galleryLoopVideo} className="rounded-2xl shadow-2xl" aspectRatio="16 / 9" />
+                <span className="absolute -top-2 -left-2 w-10 h-10 border-t-2 border-l-2 pointer-events-none" style={{ borderColor: "hsl(var(--gold))" }} />
+                <span className="absolute -bottom-2 -right-2 w-10 h-10 border-b-2 border-r-2 pointer-events-none" style={{ borderColor: "hsl(var(--gold))" }} />
+              </div>
+            </div>
+          </section>
+        </FadeSection>
+      )}
+
+
 
 
       {/* Highlights */}
@@ -639,62 +740,14 @@ const HotelPage = () => {
           />
 
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
+          <div className="space-y-20 md:space-y-28 max-w-6xl mx-auto">
             {hotel.rooms.map((room, i) => (
-              <motion.div
-                key={i}
-                className="group relative bg-background rounded-2xl overflow-hidden luxe-lift luxe-fog"
-                style={{ border: "1px solid hsl(var(--border) / 0.25)" }}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1, duration: 0.6 }}
-              >
-
-                {/* Full-bleed image */}
-                <div className="relative overflow-hidden">
-                  <img src={room.image} alt={room.name} className="w-full aspect-[4/3] object-cover group-hover:scale-110 transition-transform duration-700 ease-out" loading="lazy" />
-                  {/* Gradient overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-foreground/10 to-transparent" />
-                  {/* Price badge */}
-                  <div className="absolute top-4 right-4 px-4 py-1.5 rounded-full backdrop-blur-md" style={{ background: "hsl(var(--background) / 0.85)", border: "1px solid hsl(var(--gold) / 0.2)" }}>
-                    <span className="text-xs font-display text-foreground" style={{ fontWeight: 500 }}>{room.price}</span>
-                    <span className="text-[7px] text-muted-foreground/60 ml-1">/night</span>
-                  </div>
-                  {/* Room name on image */}
-                  <div className="absolute bottom-4 left-5 right-5">
-                    <h3 className="text-lg sm:text-xl font-display text-background tracking-wide" style={{ fontWeight: 600 }}>{room.name}</h3>
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div className="px-5 pt-4 pb-5">
-                  <p className="text-xs text-muted-foreground/70 font-body leading-relaxed" style={{ fontWeight: 300 }}>{room.description}</p>
-                  
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    {room.features.slice(0, 4).map((f) => (
-                      <span key={f} className="text-[7px] px-3 py-1.5 rounded-full font-body tracking-wider uppercase" style={{ fontWeight: 400, background: "hsl(var(--gold) / 0.08)", color: "hsl(var(--gold-dark, var(--foreground)))", border: "1px solid hsl(var(--gold) / 0.12)" }}>
-                        {f}
-                      </span>
-                    ))}
-                  </div>
-
-                  <motion.a
-                    href="#booking"
-                    className="luxe-shimmer w-full mt-4 py-3 rounded-xl text-[9px] tracking-[0.2em] uppercase font-body bg-foreground text-background hover:bg-foreground/90 transition-all duration-300 inline-flex items-center justify-center gap-2"
-                    style={{ fontWeight: 500 }}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.97 }}
-                  >
-                    Reserve Now <ArrowRight className="w-3 h-3" />
-                  </motion.a>
-
-                </div>
-              </motion.div>
+              <RoomSection key={room.key} hotelId={hotel.id} room={room} index={i} />
             ))}
           </div>
         </section>
       </FadeSection>
+
 
       {/* Amenities */}
       <FadeSection>

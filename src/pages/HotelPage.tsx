@@ -661,25 +661,27 @@ const HotelPage = () => {
         </section>
       </FadeSection>
 
-      {/* Rooms & Suites */}
-      <FadeSection>
-        <section id="rooms" className="section-padding">
-          <SectionHeader
-            eyebrow="Accommodations"
-            title="Rooms &"
-            accent="Suites"
-            subtitle="Each residence is thoughtfully composed — natural light, hand-finished textiles, and quiet luxury at every turn."
-            className="mb-10 md:mb-14"
-          />
-
-
-          <div className="space-y-20 md:space-y-28 max-w-6xl mx-auto">
-            {hotel.rooms.map((room, i) => (
-              <RoomSection key={room.key} hotelId={hotel.id} room={room} index={i} />
-            ))}
-          </div>
-        </section>
-      </FadeSection>
+      {/* Rooms & Suites — full details moved to /hotel/:id/comfortable-rooms-suites */}
+      {hotel.rooms.length > 0 && (
+        <FadeSection>
+          <section id="rooms" className="section-padding text-center">
+            <SectionHeader
+              eyebrow="Accommodations"
+              title="Rooms &"
+              accent="Suites"
+              subtitle="Explore our full collection of Premium, Deluxe, Executive, Twin Deluxe and Suite residences."
+              className="mb-8"
+            />
+            <button
+              onClick={() => navigateTo(`/hotel/${id}/comfortable-rooms-suites`)}
+              className="luxe-shimmer inline-flex items-center gap-2 px-8 py-3 text-[10px] tracking-[0.28em] uppercase font-body"
+              style={{ background: "hsl(var(--gold))", color: "hsl(var(--background))", fontWeight: 400 }}
+            >
+              View All Rooms <ArrowRight className="w-3 h-3" />
+            </button>
+          </section>
+        </FadeSection>
+      )}
 
 
       {/* Amenities */}

@@ -70,7 +70,8 @@ const MediaGallery = ({ items, title, className = "" }: Props) => {
           {sorted.map((item, i) => (
             <div key={item.id || i} className="min-w-full snap-center px-5">
               <div
-                className="relative w-full aspect-[4/3] overflow-hidden rounded-xl bg-muted cursor-pointer"
+                className={`relative w-full overflow-hidden rounded-xl bg-muted cursor-pointer mx-auto ${item.type === "video" ? "max-w-[280px]" : ""}`}
+                style={{ aspectRatio: item.type === "video" ? "9 / 16" : "4 / 3" }}
                 onClick={() => setLightbox(item)}
               >
                 {item.type === "video" ? (

@@ -150,6 +150,11 @@ const HotelPage = () => {
   const heroY = useTransform(heroScroll, [0, 1], ["0%", "30%"]);
   const heroOpacity = useTransform(heroScroll, [0, 0.6], [1, 0]);
 
+  // Admin overrides for main page media (always called — safe defaults when hotel missing)
+  const heroImageOverride = useMediaUrl(id || "", "hero", hotel?.heroImage || "");
+  const stepIntoVideoItems = useGallery(id || "", "evara-loop-video", [], galleryLoopVideo);
+  const stepIntoVideoUrl = stepIntoVideoItems[0]?.url || galleryLoopVideo;
+
   if (!hotel) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">

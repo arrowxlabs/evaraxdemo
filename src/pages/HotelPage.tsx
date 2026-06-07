@@ -88,6 +88,50 @@ const ParallaxImage = ({ src, alt, className }: { src: string; alt: string; clas
 
 // RoomSection now lives in src/components/RoomSection.tsx
 
+// Per-highlight card on hotel page — uses admin override image when present.
+const HighlightCard = ({
+  hotelId,
+  highlight,
+  index,
+  onNavigate,
+}: {
+  hotelId: string;
+  highlight: any;
+  index: number;
+  onNavigate: () => void;
+}) => {
+  const mainImage = useMediaUrl(hotelId, `highlight-${highlight.key}-main`, highlight.image);
+  return (
+    <FadeSection delay={0.1}>
+      <div className="section-padding">
+        <div className={`max-w-6xl mx-auto flex flex-col ${index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"} gap-6 md:gap-14 items-center`}>
+          <div className="flex-1 w-full relative group">
+            <ParallaxImage src={mainImage} alt={highlight.title} className="rounded-xl md:rounded-2xl aspect-[4/3]" />
+            <div className="absolute top-4 left-4 w-10 h-10 rounded-full flex items-center justify-center text-xs font-display" style={{ background: "hsl(var(--background) / 0.9)", border: "1px solid hsl(var(--gold) / 0.2)" }}>
+              <span style={{ color: "hsl(var(--gold))" }}>0{index + 1}</span>
+            </div>
+          </div>
+          <div className="flex-1">
+            <span className="text-[9px] tracking-[0.3em] uppercase text-primary/50 font-body" style={{ fontWeight: 300 }}>Experience</span>
+            <h3 className="text-lg sm:text-xl md:text-3xl font-display mt-1 text-foreground tracking-wide" style={{ fontWeight: 500 }}>{highlight.title}</h3>
+            <div className="w-10 h-px mt-2 mb-3" style={{ background: "hsl(var(--gold) / 0.4)" }} />
+            <p className="text-muted-foreground font-body leading-relaxed text-sm" style={{ fontWeight: 300 }}>{highlight.description}</p>
+            <button
+              onClick={onNavigate}
+              className="mt-5 group inline-flex items-center gap-2 text-[9px] tracking-[0.25em] uppercase text-primary font-body hover:gap-3 transition-all"
+              style={{ fontWeight: 400 }}
+            >
+              Explore <ArrowRight className="w-3 h-3" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </FadeSection>
+  );
+};
+
+
+
 
 
 

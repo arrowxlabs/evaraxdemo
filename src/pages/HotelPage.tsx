@@ -21,10 +21,9 @@ import SectionHeader from "@/components/SectionHeader";
 import ReserveFlow from "@/components/ReserveFlow";
 import MediaGallery from "@/components/MediaGallery";
 import LoopVideo from "@/components/LoopVideo";
-import { useGallery, useRoomPrice } from "@/hooks/useHotelMedia";
+import RoomSection from "@/components/RoomSection";
+import { useGallery, useMediaUrl } from "@/hooks/useHotelMedia";
 import { galleryLoopVideo } from "@/data/hotels";
-import evaraFacadeAsset from "@/assets/hotel-evara-facade.png.asset.json";
-const evaraFacade = evaraFacadeAsset.url;
 
 
 gsap.registerPlugin(ScrollTrigger);
@@ -87,85 +86,53 @@ const ParallaxImage = ({ src, alt, className }: { src: string; alt: string; clas
   );
 };
 
-// (Legacy single-step BookingForm replaced by multi-step <ReserveFlow />)
+// RoomSection now lives in src/components/RoomSection.tsx
 
-// Per-room editorial section: title, image, description, amenities, gallery, pricing, reserve
-const RoomSection = ({ hotelId, room, index }: { hotelId: string; room: any; index: number }) => {
-  const gallery = useGallery(hotelId, `room-${room.key}-gallery`, room.gallery || [room.image], galleryLoopVideo);
-  const mainImageItems = useGallery(hotelId, `room-${room.key}-main`, [room.image]);
-  const mainImage = mainImageItems[0]?.url || room.image;
-  const price = useRoomPrice(hotelId, room.key, { single: room.singlePrice, double: room.doublePrice, display: room.price });
-  const reverse = index % 2 === 1;
+// Per-highlight card on hotel page — uses admin override image when present.
+const HighlightCard = ({
+  hotelId,
+  highlight,
+  index,
+  onNavigate,
+}: {
+  hotelId: string;
+  highlight: any;
+  index: number;
+  onNavigate: () => void;
+}) => {
+  const mainImage = useMediaUrl(hotelId, `highlight-${highlight.key}-main`, highlight.image);
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
-    >
-      {/* Title + index */}
-      <div className="flex items-baseline gap-4 mb-6">
-        <span className="text-3xl md:text-4xl font-display" style={{ color: "hsl(var(--gold))", fontWeight: 300 }}>
-          0{index + 1}
-        </span>
-        <div className="flex-1 min-w-0">
-          <span className="text-[10px] tracking-[0.45em] uppercase font-body text-muted-foreground" style={{ fontWeight: 400 }}>Residence</span>
-          <h3 className="text-2xl md:text-4xl font-display tracking-wide text-foreground" style={{ fontWeight: 400 }}>{room.name}</h3>
-        </div>
-        <div className="hidden sm:block h-px flex-1 max-w-[120px]" style={{ background: "hsl(var(--gold) / 0.4)" }} />
-      </div>
-
-      {/* Image + copy split */}
-      <div className={`grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center ${reverse ? 'lg:[&>*:first-child]:order-2' : ''}`}>
-        <div className="lg:col-span-7 relative">
-          <div className="relative overflow-hidden rounded-2xl shadow-xl">
-            <img src={mainImage} alt={room.name} className="w-full aspect-[4/3] object-cover" loading="lazy" />
-            <span className="absolute top-3 left-3 w-8 h-8 border-t-2 border-l-2 pointer-events-none" style={{ borderColor: "hsl(var(--gold) / 0.7)" }} />
-            <span className="absolute bottom-3 right-3 w-8 h-8 border-b-2 border-r-2 pointer-events-none" style={{ borderColor: "hsl(var(--gold) / 0.7)" }} />
-          </div>
-        </div>
-        <div className="lg:col-span-5">
-          <p className="text-[15px] text-muted-foreground leading-[1.85] font-body" style={{ fontWeight: 300 }}>{room.description}</p>
-
-          {/* Amenities */}
-          <div className="mt-6">
-            <span className="text-[9px] tracking-[0.4em] uppercase text-muted-foreground font-body">Amenities</span>
-            <div className="flex flex-wrap gap-2 mt-3">
-              {(room.amenities || room.features).map((a: string) => (
-                <span key={a} className="text-[10px] px-3 py-1.5 rounded-full font-body tracking-wide" style={{ background: "hsl(var(--gold) / 0.08)", color: "hsl(var(--foreground))", border: "1px solid hsl(var(--gold) / 0.18)" }}>
-                  {a}
-                </span>
-              ))}
+    <FadeSection delay={0.1}>
+      <div className="section-padding">
+        <div className={`max-w-6xl mx-auto flex flex-col ${index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"} gap-6 md:gap-14 items-center`}>
+          <div className="flex-1 w-full relative group">
+            <ParallaxImage src={mainImage} alt={highlight.title} className="rounded-xl md:rounded-2xl aspect-[4/3]" />
+            <div className="absolute top-4 left-4 w-10 h-10 rounded-full flex items-center justify-center text-xs font-display" style={{ background: "hsl(var(--background) / 0.9)", border: "1px solid hsl(var(--gold) / 0.2)" }}>
+              <span style={{ color: "hsl(var(--gold))" }}>0{index + 1}</span>
             </div>
           </div>
-
-          {/* Pricing */}
-          <div className="mt-7 grid grid-cols-2 gap-3">
-            <div className="p-4 rounded-xl" style={{ background: "hsl(var(--secondary))", border: "1px solid hsl(var(--border))" }}>
-              <span className="text-[9px] tracking-[0.3em] uppercase text-muted-foreground font-body block">Single</span>
-              <span className="text-xl font-display text-foreground mt-1 block" style={{ fontWeight: 500 }}>{price.single || price.display}</span>
-              <span className="text-[9px] text-muted-foreground/60 font-body">/night</span>
-            </div>
-            <div className="p-4 rounded-xl" style={{ background: "hsl(var(--gold) / 0.08)", border: "1px solid hsl(var(--gold) / 0.3)" }}>
-              <span className="text-[9px] tracking-[0.3em] uppercase font-body block" style={{ color: "hsl(var(--gold))" }}>Double</span>
-              <span className="text-xl font-display mt-1 block" style={{ fontWeight: 500, color: "hsl(var(--gold))" }}>{price.double || price.display}</span>
-              <span className="text-[9px] text-muted-foreground/60 font-body">/night</span>
-            </div>
+          <div className="flex-1">
+            <span className="text-[9px] tracking-[0.3em] uppercase text-primary/50 font-body" style={{ fontWeight: 300 }}>Experience</span>
+            <h3 className="text-lg sm:text-xl md:text-3xl font-display mt-1 text-foreground tracking-wide" style={{ fontWeight: 500 }}>{highlight.title}</h3>
+            <div className="w-10 h-px mt-2 mb-3" style={{ background: "hsl(var(--gold) / 0.4)" }} />
+            <p className="text-muted-foreground font-body leading-relaxed text-sm" style={{ fontWeight: 300 }}>{highlight.description}</p>
+            <button
+              onClick={onNavigate}
+              className="mt-5 group inline-flex items-center gap-2 text-[9px] tracking-[0.25em] uppercase text-primary font-body hover:gap-3 transition-all"
+              style={{ fontWeight: 400 }}
+            >
+              Explore <ArrowRight className="w-3 h-3" />
+            </button>
           </div>
-
-          <a href="#booking" className="luxe-shimmer mt-6 inline-flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-3 text-[10px] tracking-[0.28em] uppercase font-body" style={{ background: "hsl(var(--gold))", color: "hsl(var(--background))", fontWeight: 400 }}>
-            Reserve {room.name} <ArrowRight className="w-3 h-3" />
-          </a>
         </div>
       </div>
-
-      {/* Gallery */}
-      <div className="mt-10">
-        <MediaGallery items={gallery} title={`${room.name} Gallery`} />
-      </div>
-    </motion.div>
+    </FadeSection>
   );
 };
+
+
+
+
 
 
 
@@ -182,6 +149,11 @@ const HotelPage = () => {
   const { scrollYProgress: heroScroll } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroY = useTransform(heroScroll, [0, 1], ["0%", "30%"]);
   const heroOpacity = useTransform(heroScroll, [0, 0.6], [1, 0]);
+
+  // Admin overrides for main page media (always called — safe defaults when hotel missing)
+  const heroImageOverride = useMediaUrl(id || "", "hero", hotel?.heroImage || "");
+  const stepIntoVideoItems = useGallery(id || "", "evara-loop-video", [], galleryLoopVideo);
+  const stepIntoVideoUrl = stepIntoVideoItems[0]?.url || galleryLoopVideo;
 
   if (!hotel) {
     return (
@@ -370,7 +342,7 @@ const HotelPage = () => {
 
                 <motion.div className="relative overflow-hidden bg-[hsl(var(--muted))]" style={{ y: heroY }}>
                   <img
-                    src={hotel.heroImage}
+                    src={heroImageOverride || hotel.heroImage}
                     alt={`${hotel.name} — facade`}
                     className="block w-full h-auto object-cover object-center"
                     style={{ aspectRatio: "4 / 5" }}
@@ -411,152 +383,132 @@ const HotelPage = () => {
               </div>
 
               <h1
-                className="font-display text-foreground leading-[1.05] tracking-wide"
+                className="font-display text-foreground leading-[1.02] tracking-wide"
                 style={{
                   fontWeight: 300,
-                  fontSize: "clamp(2.25rem, 6vw, 4.5rem)",
+                  fontSize: "clamp(1.85rem, 5.4vw, 4rem)",
                 }}
               >
                 {hotel.name}
               </h1>
 
-              <div className="mt-5 flex items-start justify-center lg:justify-start gap-2 text-muted-foreground max-w-md mx-auto lg:mx-0">
+              <div className="mt-4 sm:mt-5 flex items-start justify-center lg:justify-start gap-2 text-muted-foreground max-w-md mx-auto lg:mx-0">
                 <MapPin className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" style={{ color: "hsl(var(--gold))" }} />
-                <span className="text-[11px] sm:text-xs font-body tracking-wide leading-relaxed" style={{ fontWeight: 300 }}>
+                <span
+                  className="font-body tracking-wide leading-relaxed"
+                  style={{ fontWeight: 300, fontSize: "clamp(10.5px, 1.4vw, 13px)" }}
+                >
                   {hotel.address}
                 </span>
               </div>
 
-              <p className="mt-6 text-sm sm:text-[15px] text-muted-foreground/90 leading-relaxed font-body max-w-md mx-auto lg:mx-0" style={{ fontWeight: 300 }}>
+              <p
+                className="mt-5 sm:mt-6 text-muted-foreground/90 leading-relaxed font-body max-w-md mx-auto lg:mx-0"
+                style={{ fontWeight: 300, fontSize: "clamp(13px, 1.55vw, 15px)" }}
+              >
                 A boutique five-star retreat in the heart of Darbhanga, pairing modern elegance with warm Bihari hospitality.
               </p>
 
-              <div className="mt-8 flex flex-wrap items-center justify-center lg:justify-start gap-3">
+              <div className="mt-7 sm:mt-8 flex flex-wrap items-center justify-center lg:justify-start gap-2.5 sm:gap-3">
                 <a
                   href="#booking"
-                  className="luxe-shimmer px-7 py-3 text-[10px] tracking-[0.28em] uppercase font-body inline-flex items-center gap-2 transition-all duration-300 hover:opacity-90"
-                  style={{ background: "hsl(var(--gold))", color: "hsl(var(--background))", fontWeight: 400 }}
+                  className="luxe-shimmer inline-flex items-center gap-2 transition-all duration-300 hover:opacity-90 font-body"
+                  style={{
+                    background: "hsl(var(--gold))",
+                    color: "hsl(var(--background))",
+                    fontWeight: 400,
+                    padding: "clamp(10px, 1.2vw, 14px) clamp(20px, 2.4vw, 28px)",
+                    fontSize: "clamp(9px, 1.05vw, 10.5px)",
+                    letterSpacing: "0.28em",
+                    textTransform: "uppercase",
+                  }}
                 >
                   Reserve a Stay <ArrowRight className="w-3 h-3" />
                 </a>
-                <a href="#about" className="btn-ghost-line">Discover</a>
+                <a
+                  href="#about"
+                  className="btn-ghost-line"
+                  style={{
+                    padding: "clamp(10px, 1.2vw, 14px) clamp(20px, 2.4vw, 28px)",
+                    fontSize: "clamp(9px, 1.05vw, 10.5px)",
+                  }}
+                >
+                  Discover
+                </a>
               </div>
+
             </motion.div>
           </div>
         </div>
       </section>
 
 
-      {/* About — editorial split layout with facade portrait */}
+      {/* About — single column editorial copy (facade picture removed per request) */}
       <FadeSection>
         <section id="about" className="section-padding">
-          <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
-            {/* Facade image — tall portrait, the hero of this section */}
-            <div className="lg:col-span-5 relative order-2 lg:order-1">
-              <motion.div
-                className="relative overflow-hidden rounded-md"
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-80px" }}
-                transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1] }}
-              >
-                <div className="aspect-[3/4] w-full overflow-hidden">
-                  <img
-                    src={hotel.id === "evara" ? evaraFacade : (hotel.gallery[0] || hotel.heroImage)}
-                    alt={`${hotel.name} facade`}
-                    className="w-full h-full object-cover transition-transform duration-[1500ms] hover:scale-105"
-                    loading="lazy"
-                  />
-                </div>
-                {/* Gold corner frame accents */}
-                <span className="absolute top-3 left-3 w-6 h-6 border-t border-l" style={{ borderColor: "hsl(var(--gold) / 0.6)" }} />
-                <span className="absolute top-3 right-3 w-6 h-6 border-t border-r" style={{ borderColor: "hsl(var(--gold) / 0.6)" }} />
-                <span className="absolute bottom-3 left-3 w-6 h-6 border-b border-l" style={{ borderColor: "hsl(var(--gold) / 0.6)" }} />
-                <span className="absolute bottom-3 right-3 w-6 h-6 border-b border-r" style={{ borderColor: "hsl(var(--gold) / 0.6)" }} />
-              </motion.div>
-
-              {/* Floating Est. plate */}
-              <motion.div
-                className="hidden md:flex absolute -bottom-6 -right-6 lg:-right-10 bg-background px-5 py-4 shadow-2xl flex-col items-center"
-                style={{ border: "1px solid hsl(var(--gold) / 0.25)" }}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.7, delay: 0.4 }}
-              >
-                <span className="text-[8px] tracking-[0.4em] uppercase text-muted-foreground/70 font-body">Established</span>
-                <span className="text-2xl font-display mt-1" style={{ fontWeight: 300, color: "hsl(var(--gold))" }}>2024</span>
-                <div className="flex items-center gap-1 mt-1">
-                  {Array.from({ length: hotel.rating }).map((_, i) => (
-                    <Star key={i} className="w-2.5 h-2.5 fill-current" style={{ color: "hsl(var(--gold))" }} />
-                  ))}
-                </div>
-              </motion.div>
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <span className="h-px w-10" style={{ background: "hsl(var(--gold) / 0.7)" }} />
+              <span className="text-[10px] tracking-[0.45em] uppercase font-body" style={{ color: "hsl(var(--gold))", fontWeight: 400 }}>
+                Welcome to
+              </span>
+              <span className="h-px w-10" style={{ background: "hsl(var(--gold) / 0.7)" }} />
             </div>
 
-            {/* Copy column */}
-            <div className="lg:col-span-7 order-1 lg:order-2">
-              <div className="flex items-center gap-3 mb-4">
-                <span className="h-px w-10" style={{ background: "hsl(var(--gold) / 0.7)" }} />
-                <span className="text-[10px] tracking-[0.45em] uppercase font-body" style={{ color: "hsl(var(--gold))", fontWeight: 400 }}>
-                  Welcome to
-                </span>
-              </div>
+            <h2
+              className="font-display text-foreground leading-[1.05] tracking-wide"
+              style={{ fontWeight: 300, fontSize: "clamp(1.85rem, 4.6vw, 3.25rem)" }}
+            >
+              {hotel.name}
+              <span className="block italic mt-1" style={{ color: "hsl(var(--gold))", fontWeight: 300 }}>
+                Stay · Dine · Celebrate
+              </span>
+            </h2>
 
-              <h2
-                className="font-display text-foreground leading-[1.05] tracking-wide"
-                style={{ fontWeight: 300, fontSize: "clamp(2rem, 5vw, 3.5rem)" }}
-              >
-                {hotel.name}
-                <span className="block italic mt-1" style={{ color: "hsl(var(--gold))", fontWeight: 300 }}>
-                  Stay · Dine · Celebrate
-                </span>
-              </h2>
+            <div className="w-16 h-px my-6 mx-auto" style={{ background: "hsl(var(--gold) / 0.5)" }} />
 
-              <div className="w-16 h-px my-6" style={{ background: "hsl(var(--gold) / 0.5)" }} />
+            <p className="text-muted-foreground font-body leading-[1.85] text-[15px] max-w-2xl mx-auto" style={{ fontWeight: 300 }}>
+              {hotel.description}
+            </p>
 
-              <p className="text-muted-foreground font-body leading-[1.85] text-[15px] max-w-xl" style={{ fontWeight: 300 }}>
-                {hotel.description}
-              </p>
-
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-5 mt-9 max-w-xl">
-                {[
-                  { icon: Wifi, label: "High-Speed WiFi", value: "Complimentary" },
-                  { icon: Car, label: "Valet Parking", value: "Available" },
-                  { icon: Phone, label: "Concierge", value: "24 / 7" },
-                ].map((item, i) => (
-                  <div key={i} className="flex items-start gap-3">
-                    <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ background: "hsl(var(--gold) / 0.08)", border: "1px solid hsl(var(--gold) / 0.2)" }}>
-                      <item.icon className="w-3.5 h-3.5" style={{ color: "hsl(var(--gold))" }} />
-                    </div>
-                    <div className="min-w-0">
-                      <span className="text-[8px] tracking-[0.25em] uppercase text-muted-foreground/60 font-body block">{item.label}</span>
-                      <span className="text-xs font-body text-foreground block mt-0.5" style={{ fontWeight: 400 }}>{item.value}</span>
-                    </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mt-9 max-w-2xl mx-auto">
+              {[
+                { icon: Wifi, label: "High-Speed WiFi", value: "Complimentary" },
+                { icon: Car, label: "Valet Parking", value: "Available" },
+                { icon: Phone, label: "Concierge", value: "24 / 7" },
+              ].map((item, i) => (
+                <div key={i} className="flex items-center justify-center gap-3">
+                  <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ background: "hsl(var(--gold) / 0.08)", border: "1px solid hsl(var(--gold) / 0.2)" }}>
+                    <item.icon className="w-3.5 h-3.5" style={{ color: "hsl(var(--gold))" }} />
                   </div>
-                ))}
-              </div>
+                  <div className="text-left min-w-0">
+                    <span className="text-[8px] tracking-[0.25em] uppercase text-muted-foreground/60 font-body block">{item.label}</span>
+                    <span className="text-xs font-body text-foreground block mt-0.5" style={{ fontWeight: 400 }}>{item.value}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
 
-              <div className="flex flex-wrap items-center gap-4 mt-9">
-                <a
-                  href="#booking"
-                  className="px-7 py-3 text-[10px] tracking-[0.28em] uppercase font-body inline-flex items-center gap-2 transition-all duration-300 hover:opacity-90"
-                  style={{ background: "hsl(var(--gold))", color: "hsl(var(--background))", fontWeight: 400 }}
-                >
-                  Reserve a Stay <ArrowRight className="w-3 h-3" />
-                </a>
-                <a
-                  href="#experience"
-                  className="text-[10px] tracking-[0.28em] uppercase font-body inline-flex items-center gap-2 text-foreground/80 hover:text-primary transition-colors"
-                  style={{ fontWeight: 400 }}
-                >
-                  Explore Experiences <ArrowUpRight className="w-3 h-3" />
-                </a>
-              </div>
+            <div className="flex flex-wrap items-center justify-center gap-4 mt-9">
+              <a
+                href="#booking"
+                className="px-7 py-3 text-[10px] tracking-[0.28em] uppercase font-body inline-flex items-center gap-2 transition-all duration-300 hover:opacity-90"
+                style={{ background: "hsl(var(--gold))", color: "hsl(var(--background))", fontWeight: 400 }}
+              >
+                Reserve a Stay <ArrowRight className="w-3 h-3" />
+              </a>
+              <a
+                href="#experience"
+                className="text-[10px] tracking-[0.28em] uppercase font-body inline-flex items-center gap-2 text-foreground/80 hover:text-primary transition-colors"
+                style={{ fontWeight: 400 }}
+              >
+                Explore Experiences <ArrowUpRight className="w-3 h-3" />
+              </a>
             </div>
           </div>
         </section>
       </FadeSection>
+
 
       {/* ===== Looping Cinematic Video (replaces old static picture after Explore Experiences) ===== */}
       {hotel.id === "evara" && (
@@ -565,7 +517,7 @@ const HotelPage = () => {
             <div className="max-w-6xl mx-auto">
               <SectionHeader eyebrow="A Glimpse Inside" title="Step Into" accent="Evara" className="mb-8" />
               <div className="relative">
-                <LoopVideo src={galleryLoopVideo} className="rounded-2xl shadow-2xl" aspectRatio="16 / 9" />
+                <LoopVideo src={stepIntoVideoUrl} className="rounded-2xl shadow-2xl" aspectRatio="9 / 16" />
                 <span className="absolute -top-2 -left-2 w-10 h-10 border-t-2 border-l-2 pointer-events-none" style={{ borderColor: "hsl(var(--gold))" }} />
                 <span className="absolute -bottom-2 -right-2 w-10 h-10 border-b-2 border-r-2 pointer-events-none" style={{ borderColor: "hsl(var(--gold))" }} />
               </div>
@@ -580,32 +532,13 @@ const HotelPage = () => {
       {/* Highlights */}
       <section id="experience" className="bg-secondary">
         {hotel.highlights.map((highlight, i) => (
-          <FadeSection key={i} delay={0.1}>
-            <div className="section-padding">
-              <div className={`max-w-6xl mx-auto flex flex-col ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} gap-6 md:gap-14 items-center`}>
-                <div className="flex-1 w-full relative group">
-                  <ParallaxImage src={highlight.image} alt={highlight.title} className="rounded-xl md:rounded-2xl aspect-[4/3]" />
-                  {/* Hover overlay with number */}
-                  <div className="absolute top-4 left-4 w-10 h-10 rounded-full flex items-center justify-center text-xs font-display" style={{ background: "hsl(var(--background) / 0.9)", border: "1px solid hsl(var(--gold) / 0.2)" }}>
-                    <span style={{ color: "hsl(var(--gold))" }}>0{i + 1}</span>
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <span className="text-[9px] tracking-[0.3em] uppercase text-primary/50 font-body" style={{ fontWeight: 300 }}>Experience</span>
-                  <h3 className="text-lg sm:text-xl md:text-3xl font-display mt-1 text-foreground tracking-wide" style={{ fontWeight: 500 }}>{highlight.title}</h3>
-                  <div className="w-10 h-px mt-2 mb-3" style={{ background: "hsl(var(--gold) / 0.4)" }} />
-                  <p className="text-muted-foreground font-body leading-relaxed text-sm" style={{ fontWeight: 300 }}>{highlight.description}</p>
-                  <button
-                    onClick={() => navigateTo(`/hotel/${id}/${toSlug(highlight.title)}`)}
-                    className="mt-5 group inline-flex items-center gap-2 text-[9px] tracking-[0.25em] uppercase text-primary font-body hover:gap-3 transition-all"
-                    style={{ fontWeight: 400 }}
-                  >
-                    Explore <ArrowRight className="w-3 h-3" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </FadeSection>
+          <HighlightCard
+            key={highlight.key || i}
+            hotelId={hotel.id}
+            highlight={highlight}
+            index={i}
+            onNavigate={() => navigateTo(`/hotel/${id}/${toSlug(highlight.title)}`)}
+          />
         ))}
       </section>
 
@@ -728,25 +661,27 @@ const HotelPage = () => {
         </section>
       </FadeSection>
 
-      {/* Rooms & Suites */}
-      <FadeSection>
-        <section id="rooms" className="section-padding">
-          <SectionHeader
-            eyebrow="Accommodations"
-            title="Rooms &"
-            accent="Suites"
-            subtitle="Each residence is thoughtfully composed — natural light, hand-finished textiles, and quiet luxury at every turn."
-            className="mb-10 md:mb-14"
-          />
-
-
-          <div className="space-y-20 md:space-y-28 max-w-6xl mx-auto">
-            {hotel.rooms.map((room, i) => (
-              <RoomSection key={room.key} hotelId={hotel.id} room={room} index={i} />
-            ))}
-          </div>
-        </section>
-      </FadeSection>
+      {/* Rooms & Suites — full details moved to /hotel/:id/comfortable-rooms-suites */}
+      {hotel.rooms.length > 0 && (
+        <FadeSection>
+          <section id="rooms" className="section-padding text-center">
+            <SectionHeader
+              eyebrow="Accommodations"
+              title="Rooms &"
+              accent="Suites"
+              subtitle="Explore our full collection of Premium, Deluxe, Executive, Twin Deluxe and Suite residences."
+              className="mb-8"
+            />
+            <button
+              onClick={() => navigateTo(`/hotel/${id}/comfortable-rooms-suites`)}
+              className="luxe-shimmer inline-flex items-center gap-2 px-8 py-3 text-[10px] tracking-[0.28em] uppercase font-body"
+              style={{ background: "hsl(var(--gold))", color: "hsl(var(--background))", fontWeight: 400 }}
+            >
+              View All Rooms <ArrowRight className="w-3 h-3" />
+            </button>
+          </section>
+        </FadeSection>
+      )}
 
 
       {/* Amenities */}

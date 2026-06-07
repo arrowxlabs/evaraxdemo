@@ -70,7 +70,8 @@ const MediaGallery = ({ items, title, className = "" }: Props) => {
           {sorted.map((item, i) => (
             <div key={item.id || i} className="min-w-full snap-center px-5">
               <div
-                className="relative w-full aspect-[4/3] overflow-hidden rounded-xl bg-muted cursor-pointer"
+                className={`relative w-full overflow-hidden rounded-xl bg-muted cursor-pointer mx-auto ${item.type === "video" ? "max-w-[280px]" : ""}`}
+                style={{ aspectRatio: item.type === "video" ? "9 / 16" : "4 / 3" }}
                 onClick={() => setLightbox(item)}
               >
                 {item.type === "video" ? (
@@ -123,19 +124,25 @@ const MediaGallery = ({ items, title, className = "" }: Props) => {
       <div className="hidden md:grid grid-cols-12 gap-3 lg:gap-4">
         {/* Featured (first item, usually video) */}
         <div
-          className="col-span-8 row-span-2 relative aspect-[16/10] overflow-hidden rounded-2xl bg-muted cursor-pointer group"
+          className={`col-span-8 row-span-2 relative overflow-hidden rounded-2xl bg-muted cursor-pointer group ${sorted[0].type === "video" ? "flex items-center justify-center p-4" : "aspect-[16/10]"}`}
           onClick={() => setLightbox(sorted[0])}
         >
           {sorted[0].type === "video" ? (
-            <video
-              src={sorted[0].url}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="auto"
-            />
+            <div className="relative h-full max-h-[520px]" style={{ aspectRatio: "9 / 16" }}>
+              <video
+                src={sorted[0].url}
+                className="absolute inset-0 w-full h-full object-cover rounded-xl"
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="auto"
+              />
+              <div className="absolute top-3 left-3 bg-foreground/70 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1.5 z-10">
+                <Play className="w-3 h-3 fill-current" style={{ color: "hsl(var(--gold))" }} />
+                <span className="text-[8px] tracking-[0.3em] uppercase text-background font-body">Featured Video</span>
+              </div>
+            </div>
           ) : (
             <img
               src={sorted[0].url}
@@ -144,16 +151,9 @@ const MediaGallery = ({ items, title, className = "" }: Props) => {
               loading="lazy"
             />
           )}
-          {sorted[0].type === "video" && (
-            <div className="absolute top-4 left-4 bg-foreground/70 backdrop-blur-sm px-3.5 py-1.5 rounded-full flex items-center gap-2">
-              <Play className="w-3 h-3 fill-current" style={{ color: "hsl(var(--gold))" }} />
-              <span className="text-[9px] tracking-[0.3em] uppercase text-background font-body">Featured Video</span>
-            </div>
-          )}
           {/* Gold frame */}
           <span className="absolute top-3 right-3 w-8 h-8 border-t-2 border-r-2 pointer-events-none" style={{ borderColor: "hsl(var(--gold) / 0.7)" }} />
           <span className="absolute bottom-3 left-3 w-8 h-8 border-b-2 border-l-2 pointer-events-none" style={{ borderColor: "hsl(var(--gold) / 0.7)" }} />
-          <div className="absolute inset-0 bg-gradient-to-t from-foreground/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
         </div>
 
         {/* Thumbnails (next 4) */}

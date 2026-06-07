@@ -21,10 +21,9 @@ import SectionHeader from "@/components/SectionHeader";
 import ReserveFlow from "@/components/ReserveFlow";
 import MediaGallery from "@/components/MediaGallery";
 import LoopVideo from "@/components/LoopVideo";
-import { useGallery, useRoomPrice } from "@/hooks/useHotelMedia";
+import RoomSection from "@/components/RoomSection";
+import { useGallery, useMediaUrl } from "@/hooks/useHotelMedia";
 import { galleryLoopVideo } from "@/data/hotels";
-import evaraFacadeAsset from "@/assets/hotel-evara-facade.png.asset.json";
-const evaraFacade = evaraFacadeAsset.url;
 
 
 gsap.registerPlugin(ScrollTrigger);

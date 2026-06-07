@@ -517,7 +517,7 @@ const HotelPage = () => {
             <div className="max-w-6xl mx-auto">
               <SectionHeader eyebrow="A Glimpse Inside" title="Step Into" accent="Evara" className="mb-8" />
               <div className="relative">
-                <LoopVideo src={galleryLoopVideo} className="rounded-2xl shadow-2xl" aspectRatio="16 / 9" />
+                <LoopVideo src={stepIntoVideoUrl} className="rounded-2xl shadow-2xl" aspectRatio="9 / 16" />
                 <span className="absolute -top-2 -left-2 w-10 h-10 border-t-2 border-l-2 pointer-events-none" style={{ borderColor: "hsl(var(--gold))" }} />
                 <span className="absolute -bottom-2 -right-2 w-10 h-10 border-b-2 border-r-2 pointer-events-none" style={{ borderColor: "hsl(var(--gold))" }} />
               </div>

@@ -437,27 +437,6 @@ const HotelPage = () => {
                 </a>
               </div>
 
-              <div className="mt-5 flex items-start justify-center lg:justify-start gap-2 text-muted-foreground max-w-md mx-auto lg:mx-0">
-                <MapPin className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" style={{ color: "hsl(var(--gold))" }} />
-                <span className="text-[11px] sm:text-xs font-body tracking-wide leading-relaxed" style={{ fontWeight: 300 }}>
-                  {hotel.address}
-                </span>
-              </div>
-
-              <p className="mt-6 text-sm sm:text-[15px] text-muted-foreground/90 leading-relaxed font-body max-w-md mx-auto lg:mx-0" style={{ fontWeight: 300 }}>
-                A boutique five-star retreat in the heart of Darbhanga, pairing modern elegance with warm Bihari hospitality.
-              </p>
-
-              <div className="mt-8 flex flex-wrap items-center justify-center lg:justify-start gap-3">
-                <a
-                  href="#booking"
-                  className="luxe-shimmer px-7 py-3 text-[10px] tracking-[0.28em] uppercase font-body inline-flex items-center gap-2 transition-all duration-300 hover:opacity-90"
-                  style={{ background: "hsl(var(--gold))", color: "hsl(var(--background))", fontWeight: 400 }}
-                >
-                  Reserve a Stay <ArrowRight className="w-3 h-3" />
-                </a>
-                <a href="#about" className="btn-ghost-line">Discover</a>
-              </div>
             </motion.div>
           </div>
         </div>

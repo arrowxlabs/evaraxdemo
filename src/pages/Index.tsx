@@ -505,6 +505,7 @@ const Index = () => {
               hotel={hotel}
               index={index}
               onClickHotel={handleClickHotel}
+              onHoverHotel={handleHoverHotel}
             />
           ))}
         </div>

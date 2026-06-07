@@ -5,6 +5,7 @@ import { hotels } from "@/data/hotels";
 import { galleryLoopVideo } from "@/data/hotels";
 import { useGallery } from "@/hooks/useHotelMedia";
 import MediaGallery from "@/components/MediaGallery";
+import RoomSection from "@/components/RoomSection";
 import { ArrowLeft, Phone, Mail, Clock, Users, Star } from "lucide-react";
 
 

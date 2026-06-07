@@ -9,9 +9,10 @@ interface Props {
 
 /**
  * Optimized looping video — autoplay, muted, playsInline.
- * Lazy-starts via IntersectionObserver and pauses off-screen to save battery on mobile.
+ * Default 9:16 portrait per project preference. Lazy-starts via
+ * IntersectionObserver and pauses off-screen to save battery on mobile.
  */
-const LoopVideo = ({ src, poster, className = "", aspectRatio = "16 / 9" }: Props) => {
+const LoopVideo = ({ src, poster, className = "", aspectRatio = "9 / 16" }: Props) => {
   const ref = useRef<HTMLVideoElement>(null);
   const [ready, setReady] = useState(false);
 
@@ -30,7 +31,10 @@ const LoopVideo = ({ src, poster, className = "", aspectRatio = "16 / 9" }: Prop
   }, []);
 
   return (
-    <div className={`relative overflow-hidden bg-muted ${className}`} style={{ aspectRatio }}>
+    <div
+      className={`relative overflow-hidden bg-muted mx-auto ${className}`}
+      style={{ aspectRatio, maxWidth: "min(100%, 420px)" }}
+    >
       {!ready && (
         <div
           className="absolute inset-0 animate-pulse"

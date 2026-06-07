@@ -147,6 +147,19 @@ const Index = () => {
     setZoomActive(true);
   }, []);
 
+  // Warm the transition video on hover/touch so playback is instant on click.
+  const handleHoverHotel = useCallback((hotelId: string) => {
+    if (hotelId !== "evara") return;
+    const v = preloadRef.current;
+    if (!v) return;
+    try {
+      v.load();
+      v.currentTime = 0;
+    } catch {
+      /* noop */
+    }
+  }, []);
+
   const handleEvaraMidpoint = useCallback(() => {
     if (pendingPath) {
       navigate(pendingPath);

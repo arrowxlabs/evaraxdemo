@@ -383,14 +383,59 @@ const HotelPage = () => {
               </div>
 
               <h1
-                className="font-display text-foreground leading-[1.05] tracking-wide"
+                className="font-display text-foreground leading-[1.02] tracking-wide"
                 style={{
                   fontWeight: 300,
-                  fontSize: "clamp(2.25rem, 6vw, 4.5rem)",
+                  fontSize: "clamp(1.85rem, 5.4vw, 4rem)",
                 }}
               >
                 {hotel.name}
               </h1>
+
+              <div className="mt-4 sm:mt-5 flex items-start justify-center lg:justify-start gap-2 text-muted-foreground max-w-md mx-auto lg:mx-0">
+                <MapPin className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" style={{ color: "hsl(var(--gold))" }} />
+                <span
+                  className="font-body tracking-wide leading-relaxed"
+                  style={{ fontWeight: 300, fontSize: "clamp(10.5px, 1.4vw, 13px)" }}
+                >
+                  {hotel.address}
+                </span>
+              </div>
+
+              <p
+                className="mt-5 sm:mt-6 text-muted-foreground/90 leading-relaxed font-body max-w-md mx-auto lg:mx-0"
+                style={{ fontWeight: 300, fontSize: "clamp(13px, 1.55vw, 15px)" }}
+              >
+                A boutique five-star retreat in the heart of Darbhanga, pairing modern elegance with warm Bihari hospitality.
+              </p>
+
+              <div className="mt-7 sm:mt-8 flex flex-wrap items-center justify-center lg:justify-start gap-2.5 sm:gap-3">
+                <a
+                  href="#booking"
+                  className="luxe-shimmer inline-flex items-center gap-2 transition-all duration-300 hover:opacity-90 font-body"
+                  style={{
+                    background: "hsl(var(--gold))",
+                    color: "hsl(var(--background))",
+                    fontWeight: 400,
+                    padding: "clamp(10px, 1.2vw, 14px) clamp(20px, 2.4vw, 28px)",
+                    fontSize: "clamp(9px, 1.05vw, 10.5px)",
+                    letterSpacing: "0.28em",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  Reserve a Stay <ArrowRight className="w-3 h-3" />
+                </a>
+                <a
+                  href="#about"
+                  className="btn-ghost-line"
+                  style={{
+                    padding: "clamp(10px, 1.2vw, 14px) clamp(20px, 2.4vw, 28px)",
+                    fontSize: "clamp(9px, 1.05vw, 10.5px)",
+                  }}
+                >
+                  Discover
+                </a>
+              </div>
 
               <div className="mt-5 flex items-start justify-center lg:justify-start gap-2 text-muted-foreground max-w-md mx-auto lg:mx-0">
                 <MapPin className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" style={{ color: "hsl(var(--gold))" }} />

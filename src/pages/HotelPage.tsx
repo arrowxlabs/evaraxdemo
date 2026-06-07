@@ -342,7 +342,7 @@ const HotelPage = () => {
 
                 <motion.div className="relative overflow-hidden bg-[hsl(var(--muted))]" style={{ y: heroY }}>
                   <img
-                    src={hotel.heroImage}
+                    src={heroImageOverride || hotel.heroImage}
                     alt={`${hotel.name} — facade`}
                     className="block w-full h-auto object-cover object-center"
                     style={{ aspectRatio: "4 / 5" }}

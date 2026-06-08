@@ -53,7 +53,7 @@ const AdminHotel = () => {
     })();
   }, [navigate]);
 
-  // Load all media for this hotel
+  // Load all media for this hotel + auto-heal old broken public URLs
   const loadMedia = async () => {
     if (!hotel) return;
     const { data } = await supabase
@@ -61,7 +61,28 @@ const AdminHotel = () => {
       .select("*")
       .eq("hotel_id", hotel.id)
       .order("sort_order", { ascending: true });
-    setMedia((data as MediaRow[]) || []);
+    const rows = (data as MediaRow[]) || [];
+
+    // One-time auto-migration: convert legacy public URLs (which fail on private bucket)
+    // into long-lived signed URLs so previously uploaded media displays correctly.
+    const TEN_YEARS = 60 * 60 * 24 * 365 * 10;
+    const PUBLIC_PREFIX = "/storage/v1/object/public/hotel-media/";
+    const broken = rows.filter((r) => r.url.includes(PUBLIC_PREFIX));
+    if (broken.length > 0) {
+      await Promise.all(
+        broken.map(async (r) => {
+          const path = r.url.split(PUBLIC_PREFIX)[1];
+          if (!path) return;
+          const { data: signed } = await supabase.storage.from("hotel-media").createSignedUrl(path, TEN_YEARS);
+          if (signed?.signedUrl) {
+            await supabase.from("hotel_media").update({ url: signed.signedUrl }).eq("id", r.id);
+            r.url = signed.signedUrl;
+          }
+        }),
+      );
+      invalidateMedia(hotel.id);
+    }
+    setMedia(rows);
   };
 
   const loadPricing = async () => {

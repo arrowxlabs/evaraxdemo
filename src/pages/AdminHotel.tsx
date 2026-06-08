@@ -196,60 +196,95 @@ const AdminHotel = () => {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-5 md:px-8 py-10 space-y-12">
-        {/* MEDIA SECTIONS */}
-        <section>
-          <h2 className="text-2xl font-display mb-1" style={{ fontWeight: 300 }}>Media</h2>
-          <p className="text-sm text-muted-foreground mb-6">Upload images and videos for each section. Videos appear first in galleries.</p>
+      <main className="max-w-6xl mx-auto px-6 md:px-10 py-12 space-y-16">
+        {/* GROUP 01 — HOTEL PAGE ESSENTIALS */}
+        <GroupHeader eyebrow="Group 01" title="Hotel Page Essentials" description="Hero image, main gallery and the looping intro video." />
+        <div className="grid gap-5">
+          {heroSections.map((s) => (
+            <SectionEditor key={s.key} section={s} items={media.filter((m) => m.section_key === s.key)} uploading={uploading === s.key} onUpload={(f, t) => uploadFile(s.key, f, t)} onDelete={deleteMedia} />
+          ))}
+        </div>
 
-          <div className="space-y-6">
-            {sections.map((s) => {
-              const items = media.filter((m) => m.section_key === s.key);
-              return <SectionEditor key={s.key} section={s} items={items} uploading={uploading === s.key} onUpload={(f, t) => uploadFile(s.key, f, t)} onDelete={deleteMedia} />;
-            })}
+        {/* GROUP 02 — HIGHLIGHTS (Restaurant, Banquet, Rooms-overview) */}
+        {highlightGroups.length > 0 && (
+          <div className="space-y-10">
+            <GroupHeader eyebrow="Group 02" title="Experiences & Highlights" description="Each experience has a main picture (Hotel Evara page) and its own gallery (dedicated page)." />
+            {highlightGroups.map((g) => (
+              <div key={g.title}>
+                <h3 className="text-xs tracking-[0.35em] uppercase mb-4" style={{ color: "hsl(var(--gold))" }}>{g.title}</h3>
+                <div className="grid gap-5">
+                  {g.sections.map((s) => (
+                    <SectionEditor key={s.key} section={s} items={media.filter((m) => m.section_key === s.key)} uploading={uploading === s.key} onUpload={(f, t) => uploadFile(s.key, f, t)} onDelete={deleteMedia} />
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
-        </section>
+        )}
 
-        {/* PRICING */}
+        {/* GROUP 03 — ROOMS */}
+        {roomGroups.length > 0 && (
+          <div className="space-y-10">
+            <GroupHeader eyebrow="Group 03" title="Rooms & Suites Media" description="Update the main picture and gallery shown for each room." />
+            {roomGroups.map((g) => (
+              <div key={g.title}>
+                <h3 className="text-xs tracking-[0.35em] uppercase mb-4" style={{ color: "hsl(var(--gold))" }}>{g.title}</h3>
+                <div className="grid gap-5">
+                  {g.sections.map((s) => (
+                    <SectionEditor key={s.key} section={s} items={media.filter((m) => m.section_key === s.key)} uploading={uploading === s.key} onUpload={(f, t) => uploadFile(s.key, f, t)} onDelete={deleteMedia} />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* GROUP 04 — PRICING */}
         {hotel.rooms.length > 0 && (
-          <section>
-            <h2 className="text-2xl font-display mb-1" style={{ fontWeight: 300 }}>Room Pricing</h2>
-            <p className="text-sm text-muted-foreground mb-6">Update prices shown on the website.</p>
-
-            <div className="space-y-4">
+          <div>
+            <GroupHeader eyebrow="Group 04" title="Room Pricing" description="Update the prices shown on the website." />
+            <div className="space-y-4 mt-8">
               {hotel.rooms.map((r) => (
-                <div key={r.key} className="bg-card p-5 rounded-xl" style={{ border: "1px solid hsl(var(--border))" }}>
-                  <div className="flex items-center justify-between mb-4">
+                <div key={r.key} className="bg-card p-6 rounded-2xl" style={{ border: "1px solid hsl(var(--border))" }}>
+                  <div className="flex items-center justify-between mb-5">
                     <h3 className="font-display text-lg" style={{ fontWeight: 500 }}>{r.name}</h3>
                     <span className="text-[9px] tracking-[0.3em] uppercase text-muted-foreground">{r.key}</span>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                      <Label className="text-xs">Display Price</Label>
+                      <Label className="text-xs mb-1.5 block">Display Price</Label>
                       <Input value={pricing[r.key]?.display || ""} onChange={(e) => setPricing({ ...pricing, [r.key]: { ...pricing[r.key], display: e.target.value } })} placeholder="₹3,999" />
                     </div>
                     <div>
-                      <Label className="text-xs">Single Occupancy</Label>
+                      <Label className="text-xs mb-1.5 block">Single Occupancy</Label>
                       <Input value={pricing[r.key]?.single || ""} onChange={(e) => setPricing({ ...pricing, [r.key]: { ...pricing[r.key], single: e.target.value } })} placeholder="₹3,999" />
                     </div>
                     <div>
-                      <Label className="text-xs">Double Occupancy</Label>
+                      <Label className="text-xs mb-1.5 block">Double Occupancy</Label>
                       <Input value={pricing[r.key]?.double || ""} onChange={(e) => setPricing({ ...pricing, [r.key]: { ...pricing[r.key], double: e.target.value } })} placeholder="₹4,499" />
                     </div>
                   </div>
-                  <Button onClick={() => savePricing(r.key)} disabled={savingPrice === r.key} className="mt-4" size="sm">
+                  <Button onClick={() => savePricing(r.key)} disabled={savingPrice === r.key} className="mt-5" size="sm">
                     {savingPrice === r.key ? <Loader2 className="w-3 h-3 mr-2 animate-spin" /> : <Save className="w-3 h-3 mr-2" />}
                     Save Pricing
                   </Button>
                 </div>
               ))}
             </div>
-          </section>
+          </div>
         )}
       </main>
     </div>
   );
 };
+
+const GroupHeader = ({ eyebrow, title, description }: { eyebrow: string; title: string; description: string }) => (
+  <div className="border-b border-border/50 pb-5">
+    <span className="text-[10px] tracking-[0.4em] uppercase text-muted-foreground font-body">{eyebrow}</span>
+    <h2 className="text-2xl md:text-3xl font-display mt-2" style={{ fontWeight: 300 }}>{title}</h2>
+    <p className="text-sm text-muted-foreground mt-2 max-w-2xl">{description}</p>
+  </div>
+);
 
 const SectionEditor = ({
   section,

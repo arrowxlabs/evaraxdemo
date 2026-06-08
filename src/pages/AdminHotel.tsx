@@ -111,10 +111,16 @@ const AdminHotel = () => {
       const { error: upErr } = await supabase.storage.from("hotel-media").upload(path, file, {
         cacheControl: "31536000",
         upsert: false,
+        contentType: file.type || (type === "video" ? "video/mp4" : "image/jpeg"),
       });
       if (upErr) throw upErr;
-      const { data: urlData } = supabase.storage.from("hotel-media").getPublicUrl(path);
-      const url = urlData.publicUrl;
+      // Bucket is private — generate a long-lived signed URL (10 years) so the public site can display it.
+      const TEN_YEARS = 60 * 60 * 24 * 365 * 10;
+      const { data: signed, error: signErr } = await supabase.storage
+        .from("hotel-media")
+        .createSignedUrl(path, TEN_YEARS);
+      if (signErr || !signed?.signedUrl) throw signErr || new Error("Could not create URL");
+      const url = signed.signedUrl;
       const maxOrder = Math.max(0, ...media.filter((m) => m.section_key === sectionKey).map((m) => m.sort_order));
       const { error: insErr } = await supabase.from("hotel_media").insert({
         hotel_id: hotel.id,

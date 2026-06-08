@@ -186,12 +186,15 @@ const AdminHotel = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border sticky top-0 z-20 bg-background/95 backdrop-blur">
-        <div className="max-w-5xl mx-auto px-5 md:px-8 h-14 flex items-center justify-between">
-          <Link to="/admin" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="w-4 h-4" /> Back to hotels
+      <header className="border-b border-border/60 sticky top-0 z-20 bg-background/95 backdrop-blur">
+        <div className="max-w-6xl mx-auto px-6 md:px-10 h-16 flex items-center justify-between">
+          <Link to="/admin" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowLeft className="w-4 h-4" /> All hotels
           </Link>
-          <span className="text-xs tracking-[0.2em] uppercase font-display">{hotel.name}</span>
+          <div className="text-center">
+            <span className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground block leading-none">Managing</span>
+            <span className="text-sm tracking-[0.15em] uppercase font-display mt-1 block" style={{ fontWeight: 500 }}>{hotel.name}</span>
+          </div>
           <div className="w-20" />
         </div>
       </header>

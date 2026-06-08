@@ -53,7 +53,7 @@ const AdminHotel = () => {
     })();
   }, [navigate]);
 
-  // Load all media for this hotel
+  // Load all media for this hotel + auto-heal old broken public URLs
   const loadMedia = async () => {
     if (!hotel) return;
     const { data } = await supabase
@@ -61,7 +61,28 @@ const AdminHotel = () => {
       .select("*")
       .eq("hotel_id", hotel.id)
       .order("sort_order", { ascending: true });
-    setMedia((data as MediaRow[]) || []);
+    const rows = (data as MediaRow[]) || [];
+
+    // One-time auto-migration: convert legacy public URLs (which fail on private bucket)
+    // into long-lived signed URLs so previously uploaded media displays correctly.
+    const TEN_YEARS = 60 * 60 * 24 * 365 * 10;
+    const PUBLIC_PREFIX = "/storage/v1/object/public/hotel-media/";
+    const broken = rows.filter((r) => r.url.includes(PUBLIC_PREFIX));
+    if (broken.length > 0) {
+      await Promise.all(
+        broken.map(async (r) => {
+          const path = r.url.split(PUBLIC_PREFIX)[1];
+          if (!path) return;
+          const { data: signed } = await supabase.storage.from("hotel-media").createSignedUrl(path, TEN_YEARS);
+          if (signed?.signedUrl) {
+            await supabase.from("hotel_media").update({ url: signed.signedUrl }).eq("id", r.id);
+            r.url = signed.signedUrl;
+          }
+        }),
+      );
+      invalidateMedia(hotel.id);
+    }
+    setMedia(rows);
   };
 
   const loadPricing = async () => {
@@ -94,14 +115,25 @@ const AdminHotel = () => {
   if (!isAdmin) return <div className="min-h-screen flex items-center justify-center text-center px-5"><div><p className="text-sm">Access denied</p><Link to="/admin/login" className="text-xs underline text-primary mt-2 block">Sign in</Link></div></div>;
   if (!hotel) return <div className="min-h-screen flex items-center justify-center">Hotel not found</div>;
 
-  const sections: SectionDef[] = [
-    { key: "hero", label: "Hero Image (Top of Hotel Page)", hint: "First image visible when page opens" },
-    { key: "main-gallery", label: "Main Gallery (Hotel Page)", hint: "Photos in the Moments & Spaces section" },
-    { key: "evara-loop-video", label: "Looping Video Section (after Explore Experiences)", hint: "Continuously looping video tile" },
-    ...hotel.highlights.map((h) => ({ key: `highlight-${h.key}-gallery`, label: `${h.title} — Gallery (video + photos)` })),
-    ...hotel.rooms.map((r) => ({ key: `room-${r.key}-main`, label: `${r.name} — Main Image` })),
-    ...hotel.rooms.map((r) => ({ key: `room-${r.key}-gallery`, label: `${r.name} — Gallery (video + photos)` })),
+  const heroSections: SectionDef[] = [
+    { key: "hero", label: "Hero Image", hint: "First image visible when the hotel page opens" },
+    { key: "main-gallery", label: "Main Gallery (Moments & Spaces mosaic)", hint: "Used on the Hotel Evara page mosaic" },
+    { key: "evara-loop-video", label: "Step Into Evara — Looping Video", hint: "Cinematic 9:16 video tile after Explore Experiences" },
   ];
+  const highlightGroups = hotel.highlights.map((h) => ({
+    title: h.title,
+    sections: [
+      { key: `highlight-${h.key}-main`, label: `${h.title} — Main Picture`, hint: "Shown on the Hotel Evara page" },
+      { key: `highlight-${h.key}-gallery`, label: `${h.title} — Gallery`, hint: "Videos + photos for the dedicated experience page" },
+    ] as SectionDef[],
+  }));
+  const roomGroups = hotel.rooms.map((r) => ({
+    title: r.name,
+    sections: [
+      { key: `room-${r.key}-main`, label: `${r.name} — Main Image` },
+      { key: `room-${r.key}-gallery`, label: `${r.name} — Gallery (video + photos)` },
+    ] as SectionDef[],
+  }));
 
   const uploadFile = async (sectionKey: string, file: File, type: "image" | "video") => {
     setUploading(sectionKey);
@@ -111,10 +143,16 @@ const AdminHotel = () => {
       const { error: upErr } = await supabase.storage.from("hotel-media").upload(path, file, {
         cacheControl: "31536000",
         upsert: false,
+        contentType: file.type || (type === "video" ? "video/mp4" : "image/jpeg"),
       });
       if (upErr) throw upErr;
-      const { data: urlData } = supabase.storage.from("hotel-media").getPublicUrl(path);
-      const url = urlData.publicUrl;
+      // Bucket is private — generate a long-lived signed URL (10 years) so the public site can display it.
+      const TEN_YEARS = 60 * 60 * 24 * 365 * 10;
+      const { data: signed, error: signErr } = await supabase.storage
+        .from("hotel-media")
+        .createSignedUrl(path, TEN_YEARS);
+      if (signErr || !signed?.signedUrl) throw signErr || new Error("Could not create URL");
+      const url = signed.signedUrl;
       const maxOrder = Math.max(0, ...media.filter((m) => m.section_key === sectionKey).map((m) => m.sort_order));
       const { error: insErr } = await supabase.from("hotel_media").insert({
         hotel_id: hotel.id,
@@ -169,70 +207,108 @@ const AdminHotel = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border sticky top-0 z-20 bg-background/95 backdrop-blur">
-        <div className="max-w-5xl mx-auto px-5 md:px-8 h-14 flex items-center justify-between">
-          <Link to="/admin" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="w-4 h-4" /> Back to hotels
+      <header className="border-b border-border/60 sticky top-0 z-20 bg-background/95 backdrop-blur">
+        <div className="max-w-6xl mx-auto px-6 md:px-10 h-16 flex items-center justify-between">
+          <Link to="/admin" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowLeft className="w-4 h-4" /> All hotels
           </Link>
-          <span className="text-xs tracking-[0.2em] uppercase font-display">{hotel.name}</span>
+          <div className="text-center">
+            <span className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground block leading-none">Managing</span>
+            <span className="text-sm tracking-[0.15em] uppercase font-display mt-1 block" style={{ fontWeight: 500 }}>{hotel.name}</span>
+          </div>
           <div className="w-20" />
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-5 md:px-8 py-10 space-y-12">
-        {/* MEDIA SECTIONS */}
-        <section>
-          <h2 className="text-2xl font-display mb-1" style={{ fontWeight: 300 }}>Media</h2>
-          <p className="text-sm text-muted-foreground mb-6">Upload images and videos for each section. Videos appear first in galleries.</p>
+      <main className="max-w-6xl mx-auto px-6 md:px-10 py-12 space-y-16">
+        {/* GROUP 01 — HOTEL PAGE ESSENTIALS */}
+        <GroupHeader eyebrow="Group 01" title="Hotel Page Essentials" description="Hero image, main gallery and the looping intro video." />
+        <div className="grid gap-5">
+          {heroSections.map((s) => (
+            <SectionEditor key={s.key} section={s} items={media.filter((m) => m.section_key === s.key)} uploading={uploading === s.key} onUpload={(f, t) => uploadFile(s.key, f, t)} onDelete={deleteMedia} />
+          ))}
+        </div>
 
-          <div className="space-y-6">
-            {sections.map((s) => {
-              const items = media.filter((m) => m.section_key === s.key);
-              return <SectionEditor key={s.key} section={s} items={items} uploading={uploading === s.key} onUpload={(f, t) => uploadFile(s.key, f, t)} onDelete={deleteMedia} />;
-            })}
+        {/* GROUP 02 — HIGHLIGHTS (Restaurant, Banquet, Rooms-overview) */}
+        {highlightGroups.length > 0 && (
+          <div className="space-y-10">
+            <GroupHeader eyebrow="Group 02" title="Experiences & Highlights" description="Each experience has a main picture (Hotel Evara page) and its own gallery (dedicated page)." />
+            {highlightGroups.map((g) => (
+              <div key={g.title}>
+                <h3 className="text-xs tracking-[0.35em] uppercase mb-4" style={{ color: "hsl(var(--gold))" }}>{g.title}</h3>
+                <div className="grid gap-5">
+                  {g.sections.map((s) => (
+                    <SectionEditor key={s.key} section={s} items={media.filter((m) => m.section_key === s.key)} uploading={uploading === s.key} onUpload={(f, t) => uploadFile(s.key, f, t)} onDelete={deleteMedia} />
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
-        </section>
+        )}
 
-        {/* PRICING */}
+        {/* GROUP 03 — ROOMS */}
+        {roomGroups.length > 0 && (
+          <div className="space-y-10">
+            <GroupHeader eyebrow="Group 03" title="Rooms & Suites Media" description="Update the main picture and gallery shown for each room." />
+            {roomGroups.map((g) => (
+              <div key={g.title}>
+                <h3 className="text-xs tracking-[0.35em] uppercase mb-4" style={{ color: "hsl(var(--gold))" }}>{g.title}</h3>
+                <div className="grid gap-5">
+                  {g.sections.map((s) => (
+                    <SectionEditor key={s.key} section={s} items={media.filter((m) => m.section_key === s.key)} uploading={uploading === s.key} onUpload={(f, t) => uploadFile(s.key, f, t)} onDelete={deleteMedia} />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* GROUP 04 — PRICING */}
         {hotel.rooms.length > 0 && (
-          <section>
-            <h2 className="text-2xl font-display mb-1" style={{ fontWeight: 300 }}>Room Pricing</h2>
-            <p className="text-sm text-muted-foreground mb-6">Update prices shown on the website.</p>
-
-            <div className="space-y-4">
+          <div>
+            <GroupHeader eyebrow="Group 04" title="Room Pricing" description="Update the prices shown on the website." />
+            <div className="space-y-4 mt-8">
               {hotel.rooms.map((r) => (
-                <div key={r.key} className="bg-card p-5 rounded-xl" style={{ border: "1px solid hsl(var(--border))" }}>
-                  <div className="flex items-center justify-between mb-4">
+                <div key={r.key} className="bg-card p-6 rounded-2xl" style={{ border: "1px solid hsl(var(--border))" }}>
+                  <div className="flex items-center justify-between mb-5">
                     <h3 className="font-display text-lg" style={{ fontWeight: 500 }}>{r.name}</h3>
                     <span className="text-[9px] tracking-[0.3em] uppercase text-muted-foreground">{r.key}</span>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                      <Label className="text-xs">Display Price</Label>
+                      <Label className="text-xs mb-1.5 block">Display Price</Label>
                       <Input value={pricing[r.key]?.display || ""} onChange={(e) => setPricing({ ...pricing, [r.key]: { ...pricing[r.key], display: e.target.value } })} placeholder="₹3,999" />
                     </div>
                     <div>
-                      <Label className="text-xs">Single Occupancy</Label>
+                      <Label className="text-xs mb-1.5 block">Single Occupancy</Label>
                       <Input value={pricing[r.key]?.single || ""} onChange={(e) => setPricing({ ...pricing, [r.key]: { ...pricing[r.key], single: e.target.value } })} placeholder="₹3,999" />
                     </div>
                     <div>
-                      <Label className="text-xs">Double Occupancy</Label>
+                      <Label className="text-xs mb-1.5 block">Double Occupancy</Label>
                       <Input value={pricing[r.key]?.double || ""} onChange={(e) => setPricing({ ...pricing, [r.key]: { ...pricing[r.key], double: e.target.value } })} placeholder="₹4,499" />
                     </div>
                   </div>
-                  <Button onClick={() => savePricing(r.key)} disabled={savingPrice === r.key} className="mt-4" size="sm">
+                  <Button onClick={() => savePricing(r.key)} disabled={savingPrice === r.key} className="mt-5" size="sm">
                     {savingPrice === r.key ? <Loader2 className="w-3 h-3 mr-2 animate-spin" /> : <Save className="w-3 h-3 mr-2" />}
                     Save Pricing
                   </Button>
                 </div>
               ))}
             </div>
-          </section>
+          </div>
         )}
       </main>
     </div>
   );
 };
+
+const GroupHeader = ({ eyebrow, title, description }: { eyebrow: string; title: string; description: string }) => (
+  <div className="border-b border-border/50 pb-5">
+    <span className="text-[10px] tracking-[0.4em] uppercase text-muted-foreground font-body">{eyebrow}</span>
+    <h2 className="text-2xl md:text-3xl font-display mt-2" style={{ fontWeight: 300 }}>{title}</h2>
+    <p className="text-sm text-muted-foreground mt-2 max-w-2xl">{description}</p>
+  </div>
+);
 
 const SectionEditor = ({
   section,

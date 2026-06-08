@@ -661,24 +661,31 @@ const HotelPage = () => {
         </section>
       </FadeSection>
 
-      {/* Rooms & Suites — full details moved to /hotel/:id/comfortable-rooms-suites */}
+      {/* Rooms & Suites — full per-room editorial sections */}
       {hotel.rooms.length > 0 && (
         <FadeSection>
-          <section id="rooms" className="section-padding text-center">
+          <section id="rooms" className="section-padding">
             <SectionHeader
               eyebrow="Accommodations"
               title="Rooms &"
               accent="Suites"
-              subtitle="Explore our full collection of Premium, Deluxe, Executive, Twin Deluxe and Suite residences."
-              className="mb-8"
+              subtitle="Premium, Deluxe, Executive, Twin Deluxe and Suite residences — each thoughtfully composed."
+              className="mb-12"
             />
-            <button
-              onClick={() => navigateTo(`/hotel/${id}/comfortable-rooms-suites`)}
-              className="luxe-shimmer inline-flex items-center gap-2 px-8 py-3 text-[10px] tracking-[0.28em] uppercase font-body"
-              style={{ background: "hsl(var(--gold))", color: "hsl(var(--background))", fontWeight: 400 }}
-            >
-              View All Rooms <ArrowRight className="w-3 h-3" />
-            </button>
+            <div className="max-w-6xl mx-auto space-y-20">
+              {hotel.rooms.map((room, i) => (
+                <RoomSection key={room.key} hotelId={hotel.id} room={room} index={i} reserveHref="#booking" />
+              ))}
+            </div>
+            <div className="text-center mt-14">
+              <button
+                onClick={() => navigateTo(`/hotel/${id}/comfortable-rooms-suites`)}
+                className="luxe-shimmer inline-flex items-center gap-2 px-8 py-3 text-[10px] tracking-[0.28em] uppercase font-body"
+                style={{ background: "hsl(var(--gold))", color: "hsl(var(--background))", fontWeight: 400 }}
+              >
+                Explore All Rooms <ArrowRight className="w-3 h-3" />
+              </button>
+            </div>
           </section>
         </FadeSection>
       )}

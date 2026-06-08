@@ -183,6 +183,15 @@ const HighlightPage = () => {
           </div>
         )}
 
+        {/* If this is the Rooms & Suites highlight, render full per-room sections */}
+        {highlightSlug === "comfortable-rooms-suites" && hotel.rooms.length > 0 && (
+          <div className="mt-12 space-y-20">
+            {hotel.rooms.map((room, i) => (
+              <RoomSection key={room.key} hotelId={hotel.id} room={room} index={i} reserveHref={`/hotel/${hotel.id}#booking`} />
+            ))}
+          </div>
+        )}
+
         {/* Professional Media Gallery — video first, then photos */}
         <motion.div
           className="mt-14"

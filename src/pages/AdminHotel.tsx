@@ -94,14 +94,25 @@ const AdminHotel = () => {
   if (!isAdmin) return <div className="min-h-screen flex items-center justify-center text-center px-5"><div><p className="text-sm">Access denied</p><Link to="/admin/login" className="text-xs underline text-primary mt-2 block">Sign in</Link></div></div>;
   if (!hotel) return <div className="min-h-screen flex items-center justify-center">Hotel not found</div>;
 
-  const sections: SectionDef[] = [
-    { key: "hero", label: "Hero Image (Top of Hotel Page)", hint: "First image visible when page opens" },
-    { key: "main-gallery", label: "Main Gallery (Hotel Page)", hint: "Photos in the Moments & Spaces section" },
-    { key: "evara-loop-video", label: "Looping Video Section (after Explore Experiences)", hint: "Continuously looping video tile" },
-    ...hotel.highlights.map((h) => ({ key: `highlight-${h.key}-gallery`, label: `${h.title} — Gallery (video + photos)` })),
-    ...hotel.rooms.map((r) => ({ key: `room-${r.key}-main`, label: `${r.name} — Main Image` })),
-    ...hotel.rooms.map((r) => ({ key: `room-${r.key}-gallery`, label: `${r.name} — Gallery (video + photos)` })),
+  const heroSections: SectionDef[] = [
+    { key: "hero", label: "Hero Image", hint: "First image visible when the hotel page opens" },
+    { key: "main-gallery", label: "Main Gallery (Moments & Spaces mosaic)", hint: "Used on the Hotel Evara page mosaic" },
+    { key: "evara-loop-video", label: "Step Into Evara — Looping Video", hint: "Cinematic 9:16 video tile after Explore Experiences" },
   ];
+  const highlightGroups = hotel.highlights.map((h) => ({
+    title: h.title,
+    sections: [
+      { key: `highlight-${h.key}-main`, label: `${h.title} — Main Picture`, hint: "Shown on the Hotel Evara page" },
+      { key: `highlight-${h.key}-gallery`, label: `${h.title} — Gallery`, hint: "Videos + photos for the dedicated experience page" },
+    ] as SectionDef[],
+  }));
+  const roomGroups = hotel.rooms.map((r) => ({
+    title: r.name,
+    sections: [
+      { key: `room-${r.key}-main`, label: `${r.name} — Main Image` },
+      { key: `room-${r.key}-gallery`, label: `${r.name} — Gallery (video + photos)` },
+    ] as SectionDef[],
+  }));
 
   const uploadFile = async (sectionKey: string, file: File, type: "image" | "video") => {
     setUploading(sectionKey);

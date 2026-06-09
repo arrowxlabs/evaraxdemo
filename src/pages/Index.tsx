@@ -6,11 +6,15 @@ import { Phone, Mail, Instagram, Menu, X, ArrowRight } from "lucide-react";
 import HotelZoomTransition from "@/components/HotelZoomTransition";
 import EvaraGifTransition from "@/components/EvaraGifTransition";
 import LuxuryOrnament from "@/components/LuxuryOrnament";
+import { useMediaUrl } from "@/hooks/useHotelMedia";
 
 // Staggered card component with scroll-triggered animation
 const HotelCard = ({ hotel, index, onClickHotel, onHoverHotel }: { hotel: typeof hotels[0]; index: number; onClickHotel: (hotel: typeof hotels[0], rect: DOMRect) => void; onHoverHotel: (hotelId: string) => void }) => {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-80px" });
+  const cardImage = useMediaUrl(hotel.id, "homepage-card", hotel.cardImage);
+  const [imgFailed, setImgFailed] = useState(false);
+  const displayImage = imgFailed ? hotel.cardImage : cardImage;
 
   return (
     <motion.div
@@ -32,10 +36,11 @@ const HotelCard = ({ hotel, index, onClickHotel, onHoverHotel }: { hotel: typeof
       {/* Image shown directly on background — no box/shadow/border */}
       <div className="relative mb-5 md:mb-6">
         <motion.img
-          src={hotel.cardImage}
+          src={displayImage}
           alt={hotel.name}
           className="w-full object-contain"
           loading="lazy"
+          onError={() => setImgFailed(true)}
           whileHover={{ scale: 1.03 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
         />

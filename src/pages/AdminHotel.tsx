@@ -116,6 +116,7 @@ const AdminHotel = () => {
   if (!hotel) return <div className="min-h-screen flex items-center justify-center">Hotel not found</div>;
 
   const heroSections: SectionDef[] = [
+    { key: "homepage-card", label: "Homepage Card Image", hint: "Main picture shown for this hotel on the homepage grid" },
     { key: "hero", label: "Hero Image", hint: "First image visible when the hotel page opens" },
     { key: "main-gallery", label: "Main Gallery (Moments & Spaces mosaic)", hint: "Used on the Hotel Evara page mosaic" },
     { key: "evara-loop-video", label: "Step Into Evara — Looping Video", hint: "Cinematic 9:16 video tile after Explore Experiences" },
@@ -135,6 +136,25 @@ const AdminHotel = () => {
     ] as SectionDef[],
   }));
 
+  // Verify a generated URL is actually loadable before persisting — avoids the "question mark" placeholder.
+  const verifyUrlLoads = (url: string, type: "image" | "video") =>
+    new Promise<boolean>((resolve) => {
+      const timeout = window.setTimeout(() => resolve(false), 8000);
+      if (type === "image") {
+        const img = new Image();
+        img.onload = () => { window.clearTimeout(timeout); resolve(true); };
+        img.onerror = () => { window.clearTimeout(timeout); resolve(false); };
+        img.src = url;
+      } else {
+        const v = document.createElement("video");
+        v.preload = "metadata";
+        v.muted = true;
+        v.onloadedmetadata = () => { window.clearTimeout(timeout); resolve(true); };
+        v.onerror = () => { window.clearTimeout(timeout); resolve(false); };
+        v.src = url;
+      }
+    });
+
   const uploadFile = async (sectionKey: string, file: File, type: "image" | "video") => {
     setUploading(sectionKey);
     try {
@@ -153,6 +173,16 @@ const AdminHotel = () => {
         .createSignedUrl(path, TEN_YEARS);
       if (signErr || !signed?.signedUrl) throw signErr || new Error("Could not create URL");
       const url = signed.signedUrl;
+
+      // Validate the URL actually loads in the browser before saving — protects against the
+      // "broken image / question-mark" experience on the public site.
+      const loads = await verifyUrlLoads(url, type);
+      if (!loads) {
+        // Clean up the uploaded blob so we don't leave orphans behind.
+        await supabase.storage.from("hotel-media").remove([path]).catch(() => {});
+        throw new Error("Uploaded file could not be verified — please try a different file.");
+      }
+
       const maxOrder = Math.max(0, ...media.filter((m) => m.section_key === sectionKey).map((m) => m.sort_order));
       const { error: insErr } = await supabase.from("hotel_media").insert({
         hotel_id: hotel.id,
@@ -162,7 +192,7 @@ const AdminHotel = () => {
         sort_order: maxOrder + 1,
       });
       if (insErr) throw insErr;
-      toast.success("Uploaded");
+      toast.success(`${type === "video" ? "Video" : "Image"} uploaded — live on the site`);
       invalidateMedia(hotel.id);
       loadMedia();
     } catch (e: any) {
@@ -346,27 +376,38 @@ const SectionEditor = ({
       </div>
       {items.length > 0 ? (
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
-          {items.map((m) => (
-            <div key={m.id} className="relative group aspect-square rounded-lg overflow-hidden bg-muted">
-              {m.media_type === "video" ? (
-                <video src={m.url} className="w-full h-full object-cover" muted />
-              ) : (
-                <img src={m.url} alt="" className="w-full h-full object-cover" />
-              )}
-              <button
-                onClick={() => onDelete(m)}
-                className="absolute top-1 right-1 w-7 h-7 rounded-full bg-destructive/90 text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <Trash2 className="w-3 h-3" />
-              </button>
-              {m.media_type === "video" && (
-                <span className="absolute bottom-1 left-1 text-[8px] px-1.5 py-0.5 rounded bg-foreground/70 text-background">VIDEO</span>
-              )}
-            </div>
-          ))}
+          {items.map((m) => <MediaThumb key={m.id} m={m} onDelete={onDelete} />)}
         </div>
       ) : (
         <p className="text-xs text-muted-foreground italic">No custom media yet — site uses default images.</p>
+      )}
+    </div>
+  );
+};
+
+const MediaThumb = ({ m, onDelete }: { m: MediaRow; onDelete: (m: MediaRow) => void }) => {
+  const [broken, setBroken] = useState(false);
+  return (
+    <div className="relative group aspect-square rounded-lg overflow-hidden bg-muted">
+      {broken ? (
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-2 bg-destructive/10 text-destructive">
+          <span className="text-[10px] font-semibold">Failed to load</span>
+          <span className="text-[9px] opacity-70 mt-0.5">Remove & re-upload</span>
+        </div>
+      ) : m.media_type === "video" ? (
+        <video src={m.url} className="w-full h-full object-cover" muted playsInline preload="metadata" onError={() => setBroken(true)} />
+      ) : (
+        <img src={m.url} alt="" className="w-full h-full object-cover" onError={() => setBroken(true)} />
+      )}
+      <button
+        onClick={() => onDelete(m)}
+        className="absolute top-1 right-1 w-7 h-7 rounded-full bg-destructive/90 text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+        aria-label="Delete media"
+      >
+        <Trash2 className="w-3 h-3" />
+      </button>
+      {m.media_type === "video" && !broken && (
+        <span className="absolute bottom-1 left-1 text-[8px] px-1.5 py-0.5 rounded bg-foreground/70 text-background">VIDEO</span>
       )}
     </div>
   );

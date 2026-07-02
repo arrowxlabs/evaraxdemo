@@ -6,57 +6,67 @@
 
 @layer base {
   :root {
-    --background: 40 18% 96%;
-    --foreground: 30 10% 12%;
+    /* Ivory / warm-white base — luxury forest theme */
+    --background: 42 30% 97%;
+    --foreground: 145 22% 12%;
 
-    --card: 38 16% 95%;
-    --card-foreground: 30 10% 12%;
+    --card: 42 24% 96%;
+    --card-foreground: 145 22% 12%;
 
-    --popover: 40 18% 96%;
-    --popover-foreground: 30 10% 12%;
+    --popover: 42 30% 97%;
+    --popover-foreground: 145 22% 12%;
 
-    --primary: 34 42% 42%;
-    --primary-foreground: 40 20% 97%;
+    /* Deep forest green as primary */
+    --primary: 148 34% 18%;
+    --primary-foreground: 42 30% 97%;
 
-    --secondary: 38 12% 92%;
-    --secondary-foreground: 30 10% 12%;
+    --secondary: 90 12% 92%;
+    --secondary-foreground: 145 22% 12%;
 
-    --muted: 36 8% 88%;
-    --muted-foreground: 30 8% 46%;
+    --muted: 90 10% 90%;
+    --muted-foreground: 145 8% 38%;
 
-    --accent: 34 42% 42%;
-    --accent-foreground: 40 20% 97%;
+    /* Warm bronze accent */
+    --accent: 36 42% 44%;
+    --accent-foreground: 42 30% 97%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 36 10% 86%;
-    --input: 36 10% 86%;
-    --ring: 34 42% 42%;
+    --border: 90 10% 86%;
+    --input: 90 10% 86%;
+    --ring: 148 34% 18%;
 
     --radius: 0.5rem;
 
-    --gold: 34 42% 42%;
-    --gold-light: 34 38% 56%;
-    --gold-dark: 30 50% 28%;
-    --cream: 40 22% 96%;
-    --cream-dark: 36 14% 78%;
-    --charcoal: 30 10% 12%;
-    --charcoal-light: 30 8% 24%;
-    --olive: 38 28% 26%;
-    --olive-light: 36 20% 36%;
+    /* Bronze / gold accent scale (kept "gold-*" names for compatibility) */
+    --gold: 36 42% 44%;
+    --gold-light: 38 46% 60%;
+    --gold-dark: 32 48% 28%;
+    --cream: 42 30% 97%;
+    --cream-dark: 40 18% 88%;
+    --charcoal: 145 22% 12%;
+    --charcoal-light: 145 14% 22%;
+    /* Forest greens */
+    --forest: 148 34% 18%;
+    --forest-deep: 152 40% 12%;
+    --forest-mid: 146 24% 30%;
+    --moss: 100 18% 42%;
+    --moss-light: 96 20% 62%;
+    --olive: 82 22% 30%;
+    --olive-light: 82 18% 42%;
 
     --font-display: 'Cormorant Garamond', Georgia, serif;
     --font-body: 'DM Sans', system-ui, sans-serif;
 
-    --sidebar-background: 38 14% 94%;
-    --sidebar-foreground: 30 10% 12%;
-    --sidebar-primary: 34 42% 42%;
-    --sidebar-primary-foreground: 40 20% 97%;
-    --sidebar-accent: 36 8% 88%;
-    --sidebar-accent-foreground: 30 10% 12%;
-    --sidebar-border: 36 10% 86%;
-    --sidebar-ring: 34 42% 42%;
+    --sidebar-background: 42 24% 95%;
+    --sidebar-foreground: 145 22% 12%;
+    --sidebar-primary: 148 34% 18%;
+    --sidebar-primary-foreground: 42 30% 97%;
+    --sidebar-accent: 90 10% 90%;
+    --sidebar-accent-foreground: 145 22% 12%;
+    --sidebar-border: 90 10% 86%;
+    --sidebar-ring: 148 34% 18%;
   }
 }
 

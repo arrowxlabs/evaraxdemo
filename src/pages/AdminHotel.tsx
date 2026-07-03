@@ -35,22 +35,14 @@ const AdminHotel = () => {
   const [savingPrice, setSavingPrice] = useState<string | null>(null);
   const [uploading, setUploading] = useState<string | null>(null);
 
-  // Verify admin
+  // Verify admin via passcode gate
   useEffect(() => {
-    (async () => {
-      const { data: sessionData } = await supabase.auth.getSession();
-      if (!sessionData.session) {
-        navigate("/admin/login");
-        return;
-      }
-      const { data: adminRow } = await supabase
-        .from("admins")
-        .select("user_id")
-        .eq("user_id", sessionData.session.user.id)
-        .maybeSingle();
-      setIsAdmin(!!adminRow);
-      setChecking(false);
-    })();
+    if (sessionStorage.getItem("admin_gate") !== "1") {
+      navigate("/admin/login");
+      return;
+    }
+    setIsAdmin(true);
+    setChecking(false);
   }, [navigate]);
 
   // Load all media for this hotel + auto-heal old broken public URLs

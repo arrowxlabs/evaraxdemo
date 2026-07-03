@@ -1,79 +1,92 @@
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import LuxuryOrnament from "@/components/LuxuryOrnament";
+
+const PASSCODE = "0000";
 
 const AdminLogin = () => {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"login" | "signup">("login");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [digits, setDigits] = useState<string[]>(["", "", "", ""]);
+  const [error, setError] = useState(false);
+  const inputs = useRef<Array<HTMLInputElement | null>>([]);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate("/admin");
-    });
+    if (sessionStorage.getItem("admin_gate") === "1") navigate("/admin");
+    inputs.current[0]?.focus();
   }, [navigate]);
 
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: `${window.location.origin}/admin` },
-        });
-        if (error) throw error;
-        // Try to claim admin (works only if no admin exists yet)
-        await supabase.rpc("claim_admin");
-        toast.success("Account created. Signing in…");
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-      }
-      // Attempt claim on every login too (idempotent)
-      await supabase.rpc("claim_admin");
+  const handleChange = (i: number, v: string) => {
+    const val = v.replace(/\D/g, "").slice(-1);
+    const next = [...digits];
+    next[i] = val;
+    setDigits(next);
+    setError(false);
+    if (val && i < 3) inputs.current[i + 1]?.focus();
+    if (next.every((d) => d !== "")) tryUnlock(next.join(""));
+  };
+
+  const handleKey = (i: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace" && !digits[i] && i > 0) inputs.current[i - 1]?.focus();
+  };
+
+  const tryUnlock = (code: string) => {
+    if (code === PASSCODE) {
+      sessionStorage.setItem("admin_gate", "1");
+      toast.success("Welcome back");
       navigate("/admin");
-    } catch (err: any) {
-      toast.error(err.message || "Authentication failed");
-    } finally {
-      setLoading(false);
+    } else {
+      setError(true);
+      setDigits(["", "", "", ""]);
+      setTimeout(() => inputs.current[0]?.focus(), 50);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-5">
-      <div className="w-full max-w-sm">
-        <div className="text-center mb-8">
-          <h1 className="font-display text-3xl text-foreground" style={{ fontWeight: 300 }}>EVARA <span style={{ color: "hsl(var(--gold))" }}>Admin</span></h1>
-          <p className="text-[10px] tracking-[0.4em] uppercase text-muted-foreground mt-2 font-body">Owner access only</p>
+    <div className="min-h-screen flex items-center justify-center px-5" style={{ background: "hsl(var(--background))" }}>
+      <div className="w-full max-w-sm text-center">
+        <LuxuryOrnament width={140} className="mx-auto mb-6" />
+        <h1 className="font-display text-3xl" style={{ fontWeight: 300, color: "hsl(var(--foreground))" }}>
+          EVARA <span className="italic" style={{ color: "hsl(var(--gold))" }}>Admin</span>
+        </h1>
+        <p className="text-[10px] tracking-[0.45em] uppercase mt-3 mb-10" style={{ color: "hsl(var(--muted-foreground))" }}>
+          Enter passcode
+        </p>
+
+        <div className={`flex justify-center gap-3 mb-6 ${error ? "animate-[shake_0.4s_ease-in-out]" : ""}`}>
+          {digits.map((d, i) => (
+            <input
+              key={i}
+              ref={(el) => (inputs.current[i] = el)}
+              type="password"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              maxLength={1}
+              value={d}
+              onChange={(e) => handleChange(i, e.target.value)}
+              onKeyDown={(e) => handleKey(i, e)}
+              className="w-14 h-16 text-center text-2xl font-display rounded-xl outline-none transition-all"
+              style={{
+                border: `1px solid ${error ? "hsl(var(--destructive) / 0.6)" : "hsl(var(--border))"}`,
+                background: "hsl(var(--card))",
+                color: "hsl(var(--foreground))",
+                boxShadow: d ? "0 0 0 3px hsl(var(--gold) / 0.15)" : "none",
+              }}
+            />
+          ))}
         </div>
-        <form onSubmit={submit} className="space-y-4 bg-card p-6 rounded-2xl" style={{ border: "1px solid hsl(var(--border))" }}>
-          <div>
-            <Label htmlFor="email" className="text-xs">Email</Label>
-            <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
-          </div>
-          <div>
-            <Label htmlFor="password" className="text-xs">Password</Label>
-            <Input id="password" type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
-          </div>
-          <Button type="submit" disabled={loading} className="w-full" style={{ background: "hsl(var(--gold))", color: "hsl(var(--background))" }}>
-            {loading ? "Please wait…" : mode === "login" ? "Sign In" : "Create Account"}
-          </Button>
-          <button type="button" onClick={() => setMode(mode === "login" ? "signup" : "login")} className="w-full text-[10px] tracking-[0.3em] uppercase text-muted-foreground hover:text-foreground transition-colors">
-            {mode === "login" ? "First time? Create owner account" : "Already have an account? Sign in"}
-          </button>
-        </form>
-        <p className="text-[9px] text-muted-foreground/60 text-center mt-5 font-body leading-relaxed">
-          The first account created becomes the sole owner. Subsequent signups will not gain admin access.
+
+        {error && (
+          <p className="text-xs" style={{ color: "hsl(var(--destructive))" }}>
+            Incorrect passcode — please try again
+          </p>
+        )}
+
+        <p className="text-[9px] mt-10 leading-relaxed" style={{ color: "hsl(var(--muted-foreground) / 0.6)" }}>
+          Owner access only. This gate protects the content manager for EVARA properties.
         </p>
       </div>
+      <style>{`@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }`}</style>
     </div>
   );
 };

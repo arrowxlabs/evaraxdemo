@@ -20,6 +20,7 @@ const MUTE_KEY = "evara-transition-muted";
  * - Navigates ~700ms before end so the hotel page is fully ready
  */
 const EvaraGifTransition = ({ isActive, onMidpoint, onComplete }: EvaraGifTransitionProps) => {
+  const transition = useTransitionVideo();
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [showFlash, setShowFlash] = useState(false);

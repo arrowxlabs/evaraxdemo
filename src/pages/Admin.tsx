@@ -1,9 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { hotels } from "@/data/hotels";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, LogOut, Image as ImageIcon, ShieldCheck, Film } from "lucide-react";
+import { ArrowRight, LogOut, Image as ImageIcon, ShieldCheck, Film, Upload, Loader2, RotateCcw, Trash2, CheckCircle2 } from "lucide-react";
 import LuxuryOrnament from "@/components/LuxuryOrnament";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  useTransitionVideo,
+  invalidateTransitionVideo,
+  fetchTransitionVideo,
+} from "@/hooks/useTransitionVideo";
+import { toast } from "sonner";
 
 const Admin = () => {
   const navigate = useNavigate();

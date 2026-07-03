@@ -133,19 +133,22 @@ const EvaraGifTransition = ({ isActive, onMidpoint, onComplete }: EvaraGifTransi
             transition={{ duration: 6, ease: "linear" }}
           >
             <video
+              key={transition.version}
               ref={videoRef}
               className="absolute inset-0 w-full h-full object-cover"
               autoPlay
               muted
               playsInline
               preload="auto"
-              poster="/transitions/evara-transition-poster.jpg"
+              poster={transition.posterUrl}
               {...({ "webkit-playsinline": "true" } as Record<string, string>)}
               disableRemotePlayback
               style={{ backgroundColor: "hsl(38 45% 94%)" }}
             >
-              <source src="/transitions/evara-transition-fast.webm" type="video/webm" />
-              <source src="/transitions/evara-transition-fast.mp4" type="video/mp4" />
+              {transition.webmUrl && !transition.isCustom && (
+                <source src={transition.webmUrl} type="video/webm" />
+              )}
+              <source src={transition.mp4Url} type="video/mp4" />
             </video>
           </motion.div>
 

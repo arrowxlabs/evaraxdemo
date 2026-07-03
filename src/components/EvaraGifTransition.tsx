@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Volume2, VolumeX } from "lucide-react";
+import { useTransitionVideo } from "@/hooks/useTransitionVideo";
 
 interface EvaraGifTransitionProps {
   isActive: boolean;

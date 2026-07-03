@@ -116,7 +116,7 @@ const EvaraGifTransition = ({ isActive, onMidpoint, onComplete }: EvaraGifTransi
           // Use the poster as immediate backdrop — zero black flash before first video frame
           style={{
             backgroundColor: "hsl(38 45% 94%)",
-            backgroundImage: "url(/transitions/evara-transition-poster.jpg)",
+            backgroundImage: `url(${transition.posterUrl})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}

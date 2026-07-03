@@ -1,58 +1,31 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { hotels } from "@/data/hotels";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, LogOut, Settings, Image as ImageIcon, ShieldCheck } from "lucide-react";
+import { ArrowRight, LogOut, Image as ImageIcon, ShieldCheck, Film } from "lucide-react";
+import LuxuryOrnament from "@/components/LuxuryOrnament";
 
 const Admin = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [email, setEmail] = useState("");
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((_evt, session) => {
-      if (!session) navigate("/admin/login");
-    });
-    (async () => {
-      const { data: sessionData } = await supabase.auth.getSession();
-      if (!sessionData.session) {
-        navigate("/admin/login");
-        return;
-      }
-      setEmail(sessionData.session.user.email || "");
-      await supabase.rpc("claim_admin");
-      const { data: adminRow } = await supabase
-        .from("admins")
-        .select("user_id")
-        .eq("user_id", sessionData.session.user.id)
-        .maybeSingle();
-      setIsAdmin(!!adminRow);
-      setLoading(false);
-    })();
-    return () => sub.subscription.unsubscribe();
+    if (sessionStorage.getItem("admin_gate") !== "1") {
+      navigate("/admin/login");
+      return;
+    }
+    setReady(true);
   }, [navigate]);
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
+  const signOut = () => {
+    sessionStorage.removeItem("admin_gate");
     navigate("/admin/login");
   };
 
-  if (loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-background"><p className="text-muted-foreground text-sm">Loading…</p></div>;
-  }
-
-  if (!isAdmin) {
+  if (!ready) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-5">
-        <div className="text-center max-w-md">
-          <h1 className="text-2xl font-display text-foreground mb-3" style={{ fontWeight: 300 }}>Access Denied</h1>
-          <p className="text-sm text-muted-foreground mb-6">
-            Signed in as <strong>{email}</strong> — this account is not the owner.
-          </p>
-          <Button onClick={signOut} variant="outline">Sign Out</Button>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <p className="text-muted-foreground text-sm">Loading…</p>
       </div>
     );
   }
@@ -70,26 +43,28 @@ const Admin = () => {
               <span className="text-[10px] text-muted-foreground tracking-wider">Content Manager</span>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="text-xs text-muted-foreground hidden sm:inline">{email}</span>
-            <Button onClick={signOut} variant="ghost" size="sm"><LogOut className="w-4 h-4 mr-2" />Sign Out</Button>
-          </div>
+          <Button onClick={signOut} variant="ghost" size="sm"><LogOut className="w-4 h-4 mr-2" />Sign Out</Button>
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-6 md:px-10 py-12 md:py-16">
-        <div className="mb-10">
-          <span className="text-[10px] tracking-[0.4em] uppercase text-muted-foreground font-body">Properties</span>
-          <h2 className="text-3xl md:text-4xl font-display mt-2" style={{ fontWeight: 300 }}>Manage your hotels</h2>
-          <p className="text-sm text-muted-foreground mt-3 max-w-lg">Choose a property to update photos, videos, and pricing. Changes appear on the live site instantly.</p>
+      <main className="max-w-6xl mx-auto px-6 md:px-10 py-16 md:py-24">
+        <div className="text-center mb-14">
+          <LuxuryOrnament width={140} className="mx-auto mb-4" />
+          <span className="text-[10px] tracking-[0.45em] uppercase text-muted-foreground font-body">Properties</span>
+          <h2 className="text-3xl md:text-4xl font-display mt-3" style={{ fontWeight: 300 }}>
+            Manage your <span className="italic" style={{ color: "hsl(var(--gold))" }}>hotels</span>
+          </h2>
+          <p className="text-sm text-muted-foreground mt-4 max-w-lg mx-auto leading-relaxed">
+            Choose a property to update photos, videos, and pricing. Changes appear on the live site instantly.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
           {hotels.map((h) => (
             <Link
               key={h.id}
               to={`/admin/hotel/${h.id}`}
-              className="block group rounded-2xl overflow-hidden bg-card hover:shadow-2xl transition-all duration-500 hover:-translate-y-1"
+              className="block group rounded-2xl overflow-hidden bg-card luxe-lift"
               style={{ border: "1px solid hsl(var(--border))" }}
             >
               <div className="aspect-[16/10] overflow-hidden relative">
@@ -112,12 +87,54 @@ const Admin = () => {
           ))}
         </div>
 
-        <div className="mt-16 p-6 rounded-2xl flex items-start gap-4" style={{ background: "hsl(var(--gold) / 0.05)", border: "1px solid hsl(var(--gold) / 0.2)" }}>
-          <Settings className="w-5 h-5 mt-0.5 shrink-0" style={{ color: "hsl(var(--gold))" }} />
+        {/* Site-wide settings */}
+        <div className="mb-6">
+          <span className="text-[10px] tracking-[0.45em] uppercase text-muted-foreground font-body">Site Settings</span>
+          <h3 className="text-2xl font-display mt-2" style={{ fontWeight: 300 }}>Global media</h3>
+        </div>
+
+        <div className="rounded-2xl overflow-hidden bg-card mb-8" style={{ border: "1px solid hsl(var(--border))" }}>
+          <div className="grid md:grid-cols-2 gap-0">
+            <div className="aspect-video bg-foreground/5">
+              <video
+                key="preview-transition"
+                src="/transitions/evara-transition-fast.mp4"
+                poster="/transitions/evara-transition-poster.jpg"
+                className="w-full h-full object-cover"
+                autoPlay
+                muted
+                loop
+                playsInline
+              />
+            </div>
+            <div className="p-8 flex flex-col justify-center">
+              <div className="flex items-center gap-2 mb-3">
+                <Film className="w-4 h-4" style={{ color: "hsl(var(--gold))" }} />
+                <span className="text-[10px] tracking-[0.4em] uppercase text-muted-foreground">Hotel Transition Video</span>
+              </div>
+              <h4 className="font-display text-xl mb-3" style={{ fontWeight: 400 }}>
+                Cinematic gate approach
+              </h4>
+              <p className="text-sm text-muted-foreground leading-relaxed mb-5">
+                Plays when a guest opens a hotel from the homepage. Optimised for instant playback (720p H.264 + VP9
+                WebM, ~1.3&nbsp;MB, faststart).
+              </p>
+              <p className="text-[11px] text-muted-foreground/70 leading-relaxed">
+                To replace this video, upload a new clip via chat and Lovable will re-encode and swap it in. Videos are
+                served from <code className="text-[10px] px-1 py-0.5 rounded bg-foreground/5">/transitions/</code> for
+                edge-cache performance.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-6 rounded-2xl flex items-start gap-4" style={{ background: "hsl(var(--gold) / 0.05)", border: "1px solid hsl(var(--gold) / 0.2)" }}>
+          <ShieldCheck className="w-5 h-5 mt-0.5 shrink-0" style={{ color: "hsl(var(--gold))" }} />
           <div>
             <h4 className="font-display text-sm mb-1" style={{ fontWeight: 500 }}>How uploads work</h4>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Inside each property, every section has its own card — view current media, add new photos or videos, and remove anything you don't need. Videos always appear first in galleries on the live site.
+              Inside each property, every section has its own card — view current media, add new photos or videos, and
+              remove anything you don't need. Videos always appear first in galleries on the live site.
             </p>
           </div>
         </div>

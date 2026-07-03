@@ -92,21 +92,29 @@ const Index = () => {
   // Kept on a ref so the browser doesn't drop the warmed cache before use.
   const preloadRef = useRef<HTMLVideoElement | null>(null);
   useEffect(() => {
-    const supportsWebm = document
-      .createElement("video")
-      .canPlayType("video/webm");
-    const v = document.createElement("video");
-    v.preload = "auto";
-    v.muted = true;
-    (v as HTMLVideoElement & { playsInline: boolean }).playsInline = true;
-    v.src = supportsWebm
-      ? "/transitions/evara-transition-fast.webm"
-      : "/transitions/evara-transition-fast.mp4";
-    v.load();
-    preloadRef.current = v;
-    const a = new Audio("/transitions/evara-chime.m4a");
-    a.preload = "auto";
+    let cancelled = false;
+    (async () => {
+      const { fetchTransitionVideo } = await import("@/hooks/useTransitionVideo");
+      const transition = await fetchTransitionVideo();
+      if (cancelled) return;
+      const supportsWebm = document.createElement("video").canPlayType("video/webm");
+      const v = document.createElement("video");
+      v.preload = "auto";
+      v.muted = true;
+      (v as HTMLVideoElement & { playsInline: boolean }).playsInline = true;
+      v.src = transition.isCustom
+        ? transition.mp4Url
+        : supportsWebm
+        ? "/transitions/evara-transition-fast.webm"
+        : transition.mp4Url;
+      v.load();
+      preloadRef.current = v;
+      const a = new Audio("/transitions/evara-chime.m4a");
+      a.preload = "auto";
+    })();
+    return () => { cancelled = true; };
   }, []);
+
 
 
   useEffect(() => {

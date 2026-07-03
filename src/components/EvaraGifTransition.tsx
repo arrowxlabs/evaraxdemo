@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Volume2, VolumeX } from "lucide-react";
+import { useTransitionVideo } from "@/hooks/useTransitionVideo";
 
 interface EvaraGifTransitionProps {
   isActive: boolean;
@@ -19,6 +20,7 @@ const MUTE_KEY = "evara-transition-muted";
  * - Navigates ~700ms before end so the hotel page is fully ready
  */
 const EvaraGifTransition = ({ isActive, onMidpoint, onComplete }: EvaraGifTransitionProps) => {
+  const transition = useTransitionVideo();
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [showFlash, setShowFlash] = useState(false);
@@ -114,7 +116,7 @@ const EvaraGifTransition = ({ isActive, onMidpoint, onComplete }: EvaraGifTransi
           // Use the poster as immediate backdrop — zero black flash before first video frame
           style={{
             backgroundColor: "hsl(38 45% 94%)",
-            backgroundImage: "url(/transitions/evara-transition-poster.jpg)",
+            backgroundImage: `url(${transition.posterUrl})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
@@ -131,19 +133,22 @@ const EvaraGifTransition = ({ isActive, onMidpoint, onComplete }: EvaraGifTransi
             transition={{ duration: 6, ease: "linear" }}
           >
             <video
+              key={transition.version}
               ref={videoRef}
               className="absolute inset-0 w-full h-full object-cover"
               autoPlay
               muted
               playsInline
               preload="auto"
-              poster="/transitions/evara-transition-poster.jpg"
+              poster={transition.posterUrl}
               {...({ "webkit-playsinline": "true" } as Record<string, string>)}
               disableRemotePlayback
               style={{ backgroundColor: "hsl(38 45% 94%)" }}
             >
-              <source src="/transitions/evara-transition-fast.webm" type="video/webm" />
-              <source src="/transitions/evara-transition-fast.mp4" type="video/mp4" />
+              {transition.webmUrl && !transition.isCustom && (
+                <source src={transition.webmUrl} type="video/webm" />
+              )}
+              <source src={transition.mp4Url} type="video/mp4" />
             </video>
           </motion.div>
 

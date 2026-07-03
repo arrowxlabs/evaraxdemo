@@ -100,40 +100,8 @@ const Admin = () => {
           <h3 className="text-2xl font-display mt-2" style={{ fontWeight: 300 }}>Global media</h3>
         </div>
 
-        <div className="rounded-2xl overflow-hidden bg-card mb-8" style={{ border: "1px solid hsl(var(--border))" }}>
-          <div className="grid md:grid-cols-2 gap-0">
-            <div className="aspect-video bg-foreground/5">
-              <video
-                key="preview-transition"
-                src="/transitions/evara-transition-fast.mp4"
-                poster="/transitions/evara-transition-poster.jpg"
-                className="w-full h-full object-cover"
-                autoPlay
-                muted
-                loop
-                playsInline
-              />
-            </div>
-            <div className="p-8 flex flex-col justify-center">
-              <div className="flex items-center gap-2 mb-3">
-                <Film className="w-4 h-4" style={{ color: "hsl(var(--gold))" }} />
-                <span className="text-[10px] tracking-[0.4em] uppercase text-muted-foreground">Hotel Transition Video</span>
-              </div>
-              <h4 className="font-display text-xl mb-3" style={{ fontWeight: 400 }}>
-                Cinematic gate approach
-              </h4>
-              <p className="text-sm text-muted-foreground leading-relaxed mb-5">
-                Plays when a guest opens a hotel from the homepage. Optimised for instant playback (720p H.264 + VP9
-                WebM, ~1.3&nbsp;MB, faststart).
-              </p>
-              <p className="text-[11px] text-muted-foreground/70 leading-relaxed">
-                To replace this video, upload a new clip via chat and Lovable will re-encode and swap it in. Videos are
-                served from <code className="text-[10px] px-1 py-0.5 rounded bg-foreground/5">/transitions/</code> for
-                edge-cache performance.
-              </p>
-            </div>
-          </div>
-        </div>
+        <TransitionVideoManager />
+
 
         <div className="p-6 rounded-2xl flex items-start gap-4" style={{ background: "hsl(var(--gold) / 0.05)", border: "1px solid hsl(var(--gold) / 0.2)" }}>
           <ShieldCheck className="w-5 h-5 mt-0.5 shrink-0" style={{ color: "hsl(var(--gold))" }} />

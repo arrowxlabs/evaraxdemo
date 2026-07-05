@@ -146,16 +146,30 @@ const Index = () => {
     return () => timers.forEach(clearTimeout);
   }, []);
 
-  const handleClickHotel = useCallback((hotel: typeof hotels[0], rect: DOMRect) => {
+  const handleClickHotel = useCallback(async (hotel: typeof hotels[0], rect: DOMRect) => {
     setPendingPath(`/hotel/${hotel.id}`);
 
-    // Hotel Evara → cinematic parallax video transition (replaces old zoom)
+    // Hotel Evara → always uses the cinematic transition.
+    // Other hotels → use the cinematic transition when a per-hotel video
+    // has been uploaded in the admin; otherwise fall back to the zoom.
     if (hotel.id === "evara") {
+      setTransitionScope(hotel.id);
       setEvaraTransitionActive(true);
       return;
     }
 
-    // All other hotels keep the existing zoom transition
+    try {
+      const { fetchTransitionVideo } = await import("@/hooks/useTransitionVideo");
+      const perHotel = await fetchTransitionVideo(hotel.id);
+      if (perHotel.isCustom && perHotel.scope === hotel.id) {
+        setTransitionScope(hotel.id);
+        setEvaraTransitionActive(true);
+        return;
+      }
+    } catch {
+      /* fall through to zoom */
+    }
+
     setZoomImage(hotel.cardImage);
     setZoomRect(rect);
     setZoomActive(true);

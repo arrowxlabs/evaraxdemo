@@ -226,6 +226,7 @@ const Index = () => {
 
       <EvaraGifTransition
         isActive={evaraTransitionActive}
+        scope={transitionScope}
         onMidpoint={handleEvaraMidpoint}
         onComplete={handleEvaraComplete}
       />

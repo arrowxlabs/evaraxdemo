@@ -7,20 +7,22 @@ interface EvaraGifTransitionProps {
   isActive: boolean;
   onMidpoint: () => void;
   onComplete: () => void;
+  /** Which transition scope to render — hotel id or the global default. */
+  scope?: string;
 }
 
 const MUTE_KEY = "evara-transition-muted";
 
 /**
- * Cinematic parallax transition for Hotel Evara.
+ * Cinematic parallax transition for hotel pages.
  * - Warm cream backdrop (no black flash on mount)
- * - Faster playback (1.3×) with parallax zoom + drift
+ * - Faster playback (1.2×) with parallax zoom + drift
  * - Gold-tinted glow that's stronger and longer
  * - Soft chime/whoosh audio cue with persistent mute toggle
- * - Navigates ~700ms before end so the hotel page is fully ready
+ * - Navigates ~900ms before end so the hotel page is fully ready
  */
-const EvaraGifTransition = ({ isActive, onMidpoint, onComplete }: EvaraGifTransitionProps) => {
-  const transition = useTransitionVideo();
+const EvaraGifTransition = ({ isActive, onMidpoint, onComplete, scope }: EvaraGifTransitionProps) => {
+  const transition = useTransitionVideo(scope);
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [showFlash, setShowFlash] = useState(false);

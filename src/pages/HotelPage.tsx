@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import constructionImg from "@/assets/construction-coming-soon.png";
 import SectionHeader from "@/components/SectionHeader";
+import BotanicalDivider from "@/components/BotanicalDivider";
 import ReserveFlow from "@/components/ReserveFlow";
 import MediaGallery from "@/components/MediaGallery";
 import LoopVideo from "@/components/LoopVideo";
@@ -318,7 +319,7 @@ const HotelPage = () => {
       </nav>
 
       {/* ===== EDITORIAL HERO — responsive split layout ===== */}
-      <section ref={heroRef} className="relative w-full overflow-hidden bg-background pt-16 md:pt-20">
+      <section ref={heroRef} className="relative w-full overflow-hidden bg-background pt-16 md:pt-20 hero-frame">
         {/* Subtle gold pattern wash */}
         <div className="absolute inset-0 pointer-events-none opacity-[0.04]" style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 30L30 60L0 30Z' fill='none' stroke='%23B8860B' stroke-width='0.5'/%3E%3C/svg%3E")`,
@@ -443,9 +444,12 @@ const HotelPage = () => {
       </section>
 
 
+      {/* Botanical divider between hero and About */}
+      <BotanicalDivider spacing="md" width={200} />
+
       {/* About — single column editorial copy (facade picture removed per request) */}
       <FadeSection>
-        <section id="about" className="section-padding">
+        <section id="about" className="section-padding pt-0">
           <div className="max-w-4xl mx-auto text-center">
             <div className="flex items-center justify-center gap-3 mb-4">
               <span className="h-px w-10" style={{ background: "hsl(var(--gold) / 0.7)" }} />
@@ -661,6 +665,8 @@ const HotelPage = () => {
         </section>
       </FadeSection>
 
+      <BotanicalDivider spacing="md" width={200} label="Suites & Sanctuary" />
+
       {/* Rooms & Suites — full per-room editorial sections */}
       {hotel.rooms.length > 0 && (
         <FadeSection>
@@ -680,8 +686,7 @@ const HotelPage = () => {
             <div className="text-center mt-14">
               <button
                 onClick={() => navigateTo(`/hotel/${id}/comfortable-rooms-suites`)}
-                className="luxe-shimmer inline-flex items-center gap-2 px-8 py-3 text-[10px] tracking-[0.28em] uppercase font-body"
-                style={{ background: "hsl(var(--gold))", color: "hsl(var(--background))", fontWeight: 400 }}
+                className="btn-lux-forest"
               >
                 Explore All Rooms <ArrowRight className="w-3 h-3" />
               </button>
@@ -690,6 +695,8 @@ const HotelPage = () => {
         </FadeSection>
       )}
 
+
+      <BotanicalDivider spacing="sm" width={180} />
 
       {/* Amenities */}
       <FadeSection>

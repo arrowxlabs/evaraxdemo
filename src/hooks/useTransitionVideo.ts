@@ -2,15 +2,16 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 /**
- * Global hotel transition video. Stored in hotel_media with a reserved
- * hotel_id of "__global__" and section_key "transition-video".
- * Returns { mp4Url, posterUrl, version } — the version is appended as a
- * cache-busting query string so a fresh upload replaces the video everywhere
- * immediately.
+ * Hotel transition video. Supports a global default (hotel_id = "__global__")
+ * plus per-hotel overrides. Videos live in the `hotel_media` table under
+ * section_key "transition-video". Returns cache-busted URLs so a fresh upload
+ * replaces the video everywhere instantly.
  */
 const DEFAULT_MP4 = "/transitions/evara-transition-fast.mp4";
 const DEFAULT_WEBM = "/transitions/evara-transition-fast.webm";
 const DEFAULT_POSTER = "/transitions/evara-transition-poster.jpg";
+
+export const GLOBAL_TRANSITION_ID = "__global__";
 
 export interface TransitionVideo {
   mp4Url: string;
@@ -19,34 +20,50 @@ export interface TransitionVideo {
   isCustom: boolean;
   version: string;
   id?: string;
+  scope: string; // "__global__" or hotel id
 }
 
-const cache: { value: TransitionVideo | null } = { value: null };
-const listeners = new Set<() => void>();
+const caches: Record<string, TransitionVideo | null> = {};
+const listeners: Record<string, Set<() => void>> = {};
 
-export const invalidateTransitionVideo = () => {
-  cache.value = null;
-  listeners.forEach((l) => l());
+const getListeners = (scope: string) => {
+  if (!listeners[scope]) listeners[scope] = new Set();
+  return listeners[scope];
 };
 
-const buildDefault = (): TransitionVideo => ({
+export const invalidateTransitionVideo = (scope: string = GLOBAL_TRANSITION_ID) => {
+  caches[scope] = null;
+  getListeners(scope).forEach((l) => l());
+};
+
+const buildDefault = (scope: string): TransitionVideo => ({
   mp4Url: DEFAULT_MP4,
   webmUrl: DEFAULT_WEBM,
   posterUrl: DEFAULT_POSTER,
   isCustom: false,
   version: "default",
+  scope,
 });
 
-export const fetchTransitionVideo = async (): Promise<TransitionVideo> => {
+export const fetchTransitionVideo = async (
+  scope: string = GLOBAL_TRANSITION_ID,
+): Promise<TransitionVideo> => {
   const { data } = await supabase
     .from("hotel_media")
     .select("id, url, created_at, media_type")
-    .eq("hotel_id", "__global__")
+    .eq("hotel_id", scope)
     .eq("section_key", "transition-video")
     .order("created_at", { ascending: false })
     .limit(1);
   const row = data?.[0];
-  if (!row || row.media_type !== "video") return buildDefault();
+  if (!row || row.media_type !== "video") {
+    // Per-hotel scopes fall back to the global custom video when set,
+    // then finally to the built-in default.
+    if (scope !== GLOBAL_TRANSITION_ID) {
+      return fetchTransitionVideo(GLOBAL_TRANSITION_ID);
+    }
+    return buildDefault(scope);
+  }
   const version = String(new Date(row.created_at).getTime());
   const sep = row.url.includes("?") ? "&" : "?";
   return {
@@ -55,31 +72,34 @@ export const fetchTransitionVideo = async (): Promise<TransitionVideo> => {
     isCustom: true,
     version,
     id: row.id,
+    scope,
   };
 };
 
-export function useTransitionVideo(): TransitionVideo {
-  const [value, setValue] = useState<TransitionVideo>(cache.value ?? buildDefault());
+export function useTransitionVideo(scope: string = GLOBAL_TRANSITION_ID): TransitionVideo {
+  const [value, setValue] = useState<TransitionVideo>(caches[scope] ?? buildDefault(scope));
 
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
-      const v = await fetchTransitionVideo();
+      const v = await fetchTransitionVideo(scope);
       if (cancelled) return;
-      cache.value = v;
+      caches[scope] = v;
       setValue(v);
     };
-    if (!cache.value) load();
+    if (!caches[scope]) load();
+    else setValue(caches[scope]!);
+
     const listener = () => {
-      if (!cache.value) load();
-      else setValue(cache.value);
+      if (!caches[scope]) load();
+      else setValue(caches[scope]!);
     };
-    listeners.add(listener);
+    getListeners(scope).add(listener);
     return () => {
       cancelled = true;
-      listeners.delete(listener);
+      getListeners(scope).delete(listener);
     };
-  }, []);
+  }, [scope]);
 
   return value;
 }

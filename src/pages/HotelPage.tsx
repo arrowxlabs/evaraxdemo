@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import constructionImg from "@/assets/construction-coming-soon.png";
 import SectionHeader from "@/components/SectionHeader";
+import BotanicalDivider from "@/components/BotanicalDivider";
 import ReserveFlow from "@/components/ReserveFlow";
 import MediaGallery from "@/components/MediaGallery";
 import LoopVideo from "@/components/LoopVideo";

@@ -444,9 +444,12 @@ const HotelPage = () => {
       </section>
 
 
+      {/* Botanical divider between hero and About */}
+      <BotanicalDivider spacing="md" width={200} />
+
       {/* About — single column editorial copy (facade picture removed per request) */}
       <FadeSection>
-        <section id="about" className="section-padding">
+        <section id="about" className="section-padding pt-0">
           <div className="max-w-4xl mx-auto text-center">
             <div className="flex items-center justify-center gap-3 mb-4">
               <span className="h-px w-10" style={{ background: "hsl(var(--gold) / 0.7)" }} />

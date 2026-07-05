@@ -287,10 +287,23 @@ const AdminHotel = () => {
           </div>
         )}
 
-        {/* GROUP 04 — PRICING */}
+        {/* GROUP 04 — TRANSITION VIDEO */}
+        <div>
+          <GroupHeader
+            eyebrow="Group 04"
+            title="Page Transition Video"
+            description="The cinematic clip that plays when a guest opens this hotel from the homepage. Uploading here overrides the global default for this hotel only."
+          />
+          <div className="mt-8">
+            <TransitionVideoManager scope={hotel.id} title={`${hotel.name} · Transition`} />
+          </div>
+          <BotanicalDivider spacing="sm" width={140} />
+        </div>
+
+        {/* GROUP 05 — PRICING */}
         {hotel.rooms.length > 0 && (
           <div>
-            <GroupHeader eyebrow="Group 04" title="Room Pricing" description="Update the prices shown on the website." />
+            <GroupHeader eyebrow="Group 05" title="Room Pricing" description="Update the prices shown on the website." />
             <div className="space-y-4 mt-8">
               {hotel.rooms.map((r) => (
                 <div key={r.key} className="bg-card p-6 rounded-2xl" style={{ border: "1px solid hsl(var(--border))" }}>

@@ -85,8 +85,9 @@ const Index = () => {
   const [zoomRect, setZoomRect] = useState<DOMRect | null>(null);
   const [pendingPath, setPendingPath] = useState<string | null>(null);
 
-  // Evara-only cinematic GIF/video transition
+  // Cinematic GIF/video transition (fires for Hotel Evara + any hotel with a custom transition video)
   const [evaraTransitionActive, setEvaraTransitionActive] = useState(false);
+  const [transitionScope, setTransitionScope] = useState<string>("__global__");
 
   // Preload the transition video + audio once so playback is instant on click.
   // Kept on a ref so the browser doesn't drop the warmed cache before use.

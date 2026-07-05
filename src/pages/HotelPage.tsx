@@ -697,6 +697,8 @@ const HotelPage = () => {
       )}
 
 
+      <BotanicalDivider spacing="sm" width={180} />
+
       {/* Amenities */}
       <FadeSection>
         <section id="amenities" className="section-padding bg-secondary">

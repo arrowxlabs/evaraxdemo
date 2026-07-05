@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Upload, Trash2, Loader2, Save, Image as ImageIcon, Video as VideoIcon } from "lucide-react";
 import { toast } from "sonner";
+import TransitionVideoManager from "@/components/admin/TransitionVideoManager";
+import BotanicalDivider from "@/components/BotanicalDivider";
 
 interface MediaRow {
   id: string;

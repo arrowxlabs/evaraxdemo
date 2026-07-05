@@ -50,7 +50,7 @@ const Admin = () => {
 
       <main className="max-w-6xl mx-auto px-6 md:px-10 py-16 md:py-24">
         <div className="text-center mb-14">
-          <LuxuryOrnament width={140} className="mx-auto mb-4" />
+          <BotanicalDivider spacing="sm" width={140} className="!py-0 mb-4" />
           <span className="text-[10px] tracking-[0.45em] uppercase text-muted-foreground font-body">Properties</span>
           <h2 className="text-3xl md:text-4xl font-display mt-3" style={{ fontWeight: 300 }}>
             Manage your <span className="italic" style={{ color: "hsl(var(--gold))" }}>hotels</span>

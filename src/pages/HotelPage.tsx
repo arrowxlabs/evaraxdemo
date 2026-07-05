@@ -665,6 +665,8 @@ const HotelPage = () => {
         </section>
       </FadeSection>
 
+      <BotanicalDivider spacing="md" width={200} label="Suites & Sanctuary" />
+
       {/* Rooms & Suites — full per-room editorial sections */}
       {hotel.rooms.length > 0 && (
         <FadeSection>

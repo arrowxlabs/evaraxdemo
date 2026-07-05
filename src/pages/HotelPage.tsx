@@ -318,7 +318,7 @@ const HotelPage = () => {
       </nav>
 
       {/* ===== EDITORIAL HERO — responsive split layout ===== */}
-      <section ref={heroRef} className="relative w-full overflow-hidden bg-background pt-16 md:pt-20">
+      <section ref={heroRef} className="relative w-full overflow-hidden bg-background pt-16 md:pt-20 hero-frame">
         {/* Subtle gold pattern wash */}
         <div className="absolute inset-0 pointer-events-none opacity-[0.04]" style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 30L30 60L0 30Z' fill='none' stroke='%23B8860B' stroke-width='0.5'/%3E%3C/svg%3E")`,

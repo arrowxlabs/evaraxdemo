@@ -686,8 +686,7 @@ const HotelPage = () => {
             <div className="text-center mt-14">
               <button
                 onClick={() => navigateTo(`/hotel/${id}/comfortable-rooms-suites`)}
-                className="luxe-shimmer inline-flex items-center gap-2 px-8 py-3 text-[10px] tracking-[0.28em] uppercase font-body"
-                style={{ background: "hsl(var(--gold))", color: "hsl(var(--background))", fontWeight: 400 }}
+                className="btn-lux-forest"
               >
                 Explore All Rooms <ArrowRight className="w-3 h-3" />
               </button>

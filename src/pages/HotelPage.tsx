@@ -156,6 +156,29 @@ const HotelPage = () => {
   const stepIntoVideoItems = useGallery(id || "", "evara-loop-video", [], galleryLoopVideo);
   const stepIntoVideoUrl = stepIntoVideoItems[0]?.url || galleryLoopVideo;
 
+  // Prefetch this hotel's HD transition video so navigating away/back is instant.
+  useEffect(() => {
+    if (!id) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const { fetchTransitionVideo } = await import("@/hooks/useTransitionVideo");
+        const t = await fetchTransitionVideo(id);
+        if (cancelled) return;
+        fetch(t.mp4Url, { cache: "force-cache", priority: "low" as RequestPriority }).catch(() => {});
+        const v = document.createElement("video");
+        v.preload = "auto";
+        v.muted = true;
+        (v as HTMLVideoElement & { playsInline: boolean }).playsInline = true;
+        v.src = t.mp4Url;
+        v.load();
+      } catch {
+        /* noop */
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [id]);
+
   if (!hotel) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">

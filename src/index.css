@@ -658,11 +658,6 @@ html[data-theme="royal"] main > * {
   z-index: 1;
 }
 
-/* Smooth theme transition */
-html { transition: background-color 0.4s ease; }
-html body,
-html [data-theme] * {
-  transition-property: background-color, border-color, color;
-  transition-duration: 0.35s;
-  transition-timing-function: ease;
-}
+/* Smooth theme transition — only html-level, no per-element universal transitions (perf) */
+html { transition: background-color 0.35s ease, color 0.35s ease; }
+

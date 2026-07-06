@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, LogOut, Image as ImageIcon, ShieldCheck } from "lucide-react";
 import BotanicalDivider from "@/components/BotanicalDivider";
 import TransitionVideoManager from "@/components/admin/TransitionVideoManager";
+import ThemeManager from "@/components/admin/ThemeManager";
 
 const Admin = () => {
   const navigate = useNavigate();

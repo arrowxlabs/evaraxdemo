@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, LogOut, Image as ImageIcon, ShieldCheck } from "lucide-react";
 import BotanicalDivider from "@/components/BotanicalDivider";
 import TransitionVideoManager from "@/components/admin/TransitionVideoManager";
+import ThemeManager from "@/components/admin/ThemeManager";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -91,8 +92,10 @@ const Admin = () => {
         {/* Site-wide settings */}
         <div className="mb-6">
           <span className="text-[10px] tracking-[0.45em] uppercase text-muted-foreground font-body">Site Settings</span>
-          <h3 className="text-2xl font-display mt-2" style={{ fontWeight: 300 }}>Global media</h3>
+          <h3 className="text-2xl font-display mt-2" style={{ fontWeight: 300 }}>Global media & theme</h3>
         </div>
+
+        <ThemeManager />
 
         <TransitionVideoManager />
 

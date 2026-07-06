@@ -175,18 +175,28 @@ const Index = () => {
     setZoomActive(true);
   }, []);
 
-  // Warm the transition video on hover/touch so playback is instant on click.
-  const handleHoverHotel = useCallback((hotelId: string) => {
-    if (hotelId !== "evara") return;
-    const v = preloadRef.current;
-    if (!v) return;
+  // Warm each hotel's transition video on hover/touch so click plays instantly.
+  const warmedRef = useRef<Set<string>>(new Set());
+  const handleHoverHotel = useCallback(async (hotelId: string) => {
+    if (warmedRef.current.has(hotelId)) return;
+    warmedRef.current.add(hotelId);
     try {
+      const { fetchTransitionVideo } = await import("@/hooks/useTransitionVideo");
+      const t = await fetchTransitionVideo(hotelId);
+      // Background HTTP-cache warm — non-blocking, low priority.
+      fetch(t.mp4Url, { cache: "force-cache", priority: "low" as RequestPriority }).catch(() => {});
+      // Also load metadata into a hidden video so playback starts instant.
+      const v = document.createElement("video");
+      v.preload = "auto";
+      v.muted = true;
+      (v as HTMLVideoElement & { playsInline: boolean }).playsInline = true;
+      v.src = t.mp4Url;
       v.load();
-      v.currentTime = 0;
     } catch {
       /* noop */
     }
   }, []);
+
 
   const handleEvaraMidpoint = useCallback(() => {
     if (pendingPath) {

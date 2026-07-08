@@ -629,4 +629,12 @@ const Index = () => {
   );
 };
 
-export default Index;
+import RoyalIndex from "./royal/RoyalIndex";
+import { useTheme } from "@/hooks/useTheme";
+
+const IndexWithTheme = () => {
+  const [theme] = useTheme();
+  return theme === "royal" ? <RoyalIndex /> : <Index />;
+};
+
+export default IndexWithTheme;

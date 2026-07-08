@@ -496,11 +496,13 @@ const RoyalIndex = () => {
       {/* Transitions */}
       <HotelZoomTransition
         isActive={zoomActive} targetImage={zoomImage} cardRect={zoomRect}
-        onComplete={() => { if (pendingPath) navigate(pendingPath); }}
+        onMidpoint={() => { if (pendingPath) navigate(pendingPath); }}
+        onComplete={() => setZoomActive(false)}
       />
       <EvaraGifTransition
         isActive={transitionActive} scope={transitionScope}
-        onComplete={() => { if (pendingPath) navigate(pendingPath); }}
+        onMidpoint={() => { if (pendingPath) navigate(pendingPath); }}
+        onComplete={() => setTransitionActive(false)}
       />
     </div>
   );

@@ -879,4 +879,12 @@ const HotelPage = () => {
   );
 };
 
-export default HotelPage;
+import RoyalHotelPage from "./royal/RoyalHotelPage";
+import { useTheme as useTheme_ } from "@/hooks/useTheme";
+
+const HotelPageWithTheme = () => {
+  const [theme] = useTheme_();
+  return theme === "royal" ? <RoyalHotelPage /> : <HotelPage />;
+};
+
+export default HotelPageWithTheme;

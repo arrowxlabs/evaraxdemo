@@ -104,7 +104,7 @@ export const WaxSeal = ({ className = "", label = "E" }: { className?: string; l
 );
 
 export const RoyalDivider = ({ className = "" }: { className?: string }) => (
-  <div className={`flex items-center justify-center gap-4 text-royal-gold ${className}`}>
+  <div className={`flex items-center justify-center gap-4 text-gold ${className}`}>
     <div className="h-px w-24 sm:w-40 bg-gradient-to-r from-transparent via-current to-current opacity-70"/>
     <FleurDeLis className="w-4 h-6 opacity-90"/>
     <div className="h-px w-24 sm:w-40 bg-gradient-to-l from-transparent via-current to-current opacity-70"/>

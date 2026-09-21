@@ -3,9 +3,8 @@ import { motion, AnimatePresence, useScroll, useTransform, useInView } from "fra
 import { useNavigate } from "react-router-dom";
 import { hotels } from "@/data/hotels";
 import { ArrowUpRight, Menu, X, Phone, Mail, Instagram } from "lucide-react";
-import HotelZoomTransition from "@/components/HotelZoomTransition";
-import EvaraGifTransition from "@/components/EvaraGifTransition";
 import { useMediaUrl } from "@/hooks/useHotelMedia";
+import { RoyalAtmosphere, useRoyalSectionReveals } from "@/components/royal/RoyalAtmosphere";
 import {
   RoyalCrown,
   FleurDeLis,
@@ -90,12 +89,10 @@ const RoyalHotelPortrait = ({
   hotel,
   index,
   onClick,
-  onHover,
 }: {
   hotel: typeof hotels[0];
   index: number;
-  onClick: (h: typeof hotels[0], rect: DOMRect) => void;
-  onHover: (id: string) => void;
+  onClick: (h: typeof hotels[0]) => void;
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-100px" });
@@ -110,48 +107,32 @@ const RoyalHotelPortrait = ({
       initial={{ opacity: 0, y: 80 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 1, delay: index * 0.15, ease: [0.25, 0.1, 0.25, 1] }}
-      className="group cursor-pointer relative"
-      onMouseEnter={() => onHover(hotel.id)}
-      onTouchStart={() => onHover(hotel.id)}
-      onClick={() => {
-        const el = ref.current?.querySelector("img");
-        const r = el?.getBoundingClientRect() || ref.current?.getBoundingClientRect();
-        if (r) onClick(hotel, r as DOMRect);
-      }}
+      className={`royal-hotel-card group cursor-pointer relative ${index === 0 ? "lg:col-span-2" : ""}`}
+      onClick={() => onClick(hotel)}
     >
-      <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-gold/70 font-display text-xs tracking-[0.5em] z-10">
-        CHAMBRE {roman}
-      </div>
-      <div className="relative aspect-[3/4] overflow-hidden">
-        {/* Ornate frame overlay */}
-        <OrnateFrame className="absolute inset-0 w-full h-full text-gold/80 z-20 pointer-events-none" />
-        {/* Inner burgundy mat */}
-        <div className="absolute inset-4 bg-gradient-to-b from-[hsl(350_55%_18%)] to-[hsl(350_60%_10%)] z-0" />
-        {/* Portrait image */}
+      <div className={`relative overflow-hidden bg-primary ${index === 0 ? "aspect-[5/4] lg:aspect-[16/9]" : "aspect-[4/5]"}`}>
         <motion.img
           src={img}
           alt={hotel.name}
           onError={() => setFailed(true)}
-          className="absolute inset-8 w-[calc(100%-4rem)] h-[calc(100%-4rem)] object-cover z-10 sepia-[.15] contrast-[1.05]"
-          whileHover={{ scale: 1.04 }}
+          className="absolute inset-0 h-full w-full object-cover opacity-90 transition-[filter] duration-700 group-hover:brightness-110"
+          whileHover={{ scale: 1.035 }}
           transition={{ duration: 0.8 }}
         />
-        {/* Bottom nameplate */}
-        <div className="absolute bottom-6 left-6 right-6 z-30 text-center">
-          <div className="mx-auto w-fit px-6 py-3 bg-[hsl(40_40%_92%)] border border-gold/60 shadow-[0_10px_30px_-15px_hsl(350_60%_10%)]">
-            <FleurDeLis className="w-3 h-4 mx-auto mb-1 text-gold-dark" />
-            <div className="font-display uppercase tracking-[0.28em] text-[11px] sm:text-sm text-[hsl(350_55%_18%)]">
-              {hotel.name}
-            </div>
-            <div className="text-[8px] tracking-[0.4em] uppercase text-gold-dark/80 mt-1">
-              {hotel.id === "evara-exotica" ? "Bientôt" : hotel.city}
-            </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/10 to-transparent" />
+        <div className="absolute inset-4 border border-gold/40 transition-all duration-500 group-hover:inset-3 group-hover:border-gold/80" />
+        <div className="absolute left-6 top-6 flex items-center gap-3 text-gold">
+          <span className="font-display text-xs tracking-[0.35em]">0{index + 1}</span>
+          <span className="h-px w-10 bg-gold/70" />
+          <span className="text-[9px] uppercase tracking-[0.35em]">Residence</span>
+        </div>
+        <div className="absolute inset-x-0 bottom-0 p-7 sm:p-9 text-primary-foreground">
+          <div className="mb-2 text-[9px] uppercase tracking-[0.4em] text-gold-light">{hotel.id === "evara-exotica" ? "Coming soon" : hotel.city}</div>
+          <div className="flex items-end justify-between gap-6">
+            <h3 className="font-display text-3xl sm:text-4xl leading-none">{hotel.name}</h3>
+            <span className="royal-card-arrow grid h-11 w-11 shrink-0 place-items-center border border-gold/50 text-gold"><ArrowUpRight className="h-4 w-4" /></span>
           </div>
         </div>
-      </div>
-      <div className="mt-6 flex items-center justify-center gap-3 text-gold-dark opacity-80 group-hover:opacity-100 transition">
-        <span className="text-[10px] tracking-[0.4em] uppercase font-display">Entrer</span>
-        <ArrowUpRight className="w-3 h-3" />
       </div>
     </motion.div>
   );
@@ -180,57 +161,25 @@ const VerticalMarquee = ({ text }: { text: string }) => (
 // ————————————————————————————————————————————————————————————
 const RoyalIndex = () => {
   const navigate = useNavigate();
+  const revealScope = useRoyalSectionReveals();
   const [menuOpen, setMenuOpen] = useState(false);
   const [introDone, setIntroDone] = useState(
     typeof window !== "undefined" && sessionStorage.getItem("evara-royal-intro") === "1"
   );
-
-  const [zoomActive, setZoomActive] = useState(false);
-  const [zoomImage, setZoomImage] = useState<string | undefined>();
-  const [zoomRect, setZoomRect] = useState<DOMRect | null>(null);
-  const [pendingPath, setPendingPath] = useState<string | null>(null);
-  const [transitionActive, setTransitionActive] = useState(false);
-  const [transitionScope, setTransitionScope] = useState<string>("__global__");
 
   const heroRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "40%"]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
-  const handleClick = useCallback(async (hotel: typeof hotels[0], rect: DOMRect) => {
-    setPendingPath(`/hotel/${hotel.id}`);
-    if (hotel.id === "evara") {
-      setTransitionScope(hotel.id);
-      setTransitionActive(true);
-      return;
-    }
-    try {
-      const { fetchTransitionVideo } = await import("@/hooks/useTransitionVideo");
-      const t = await fetchTransitionVideo(hotel.id);
-      if (t.isCustom && t.scope === hotel.id) {
-        setTransitionScope(hotel.id);
-        setTransitionActive(true);
-        return;
-      }
-    } catch { /* noop */ }
-    setZoomImage(hotel.cardImage);
-    setZoomRect(rect);
-    setZoomActive(true);
-  }, []);
-
-  const warmed = useRef<Set<string>>(new Set());
-  const handleHover = useCallback(async (id: string) => {
-    if (warmed.current.has(id)) return;
-    warmed.current.add(id);
-    try {
-      const { fetchTransitionVideo } = await import("@/hooks/useTransitionVideo");
-      const t = await fetchTransitionVideo(id);
-      fetch(t.mp4Url, { cache: "force-cache", priority: "low" as RequestPriority }).catch(() => {});
-    } catch { /* noop */ }
-  }, []);
+  const handleClick = useCallback((hotel: typeof hotels[0]) => {
+    navigate(`/hotel/${hotel.id}`);
+    window.scrollTo(0, 0);
+  }, [navigate]);
 
   return (
-    <div className="relative min-h-screen text-foreground overflow-x-hidden">
+    <div ref={revealScope} className="relative min-h-screen text-foreground overflow-x-hidden royal-cinematic-page">
+      <RoyalAtmosphere />
       {!introDone && (
         <CurtainIntro
           onDone={() => {
@@ -329,9 +278,9 @@ const RoyalIndex = () => {
       </section>
 
       {/* ————— CHAPTER I : LEGACY ————— */}
-      <section id="chapters" className="relative py-32 sm:py-48 px-6 overflow-hidden bg-[hsl(40_35%_92%)]">
+      <section id="chapters" data-royal-reveal className="relative py-32 sm:py-48 px-6 overflow-hidden bg-[hsl(40_35%_92%)]/90">
         <VerticalMarquee text="Legatum · Gratia · Traditio" />
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
+        <div data-royal-content className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
           <motion.div
             initial={{ opacity: 0, x: -40 }} whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-100px" }} transition={{ duration: 1 }}
@@ -380,7 +329,8 @@ const RoyalIndex = () => {
       </section>
 
       {/* ————— CHAPTER II : PALACES (hotel portraits) ————— */}
-      <section id="palaces" className="relative py-32 sm:py-40 px-6 bg-gradient-to-b from-[hsl(40_30%_88%)] via-background to-[hsl(40_35%_90%)]">
+      <section id="palaces" data-royal-reveal className="relative py-32 sm:py-40 px-6 royal-palaces-section">
+        <div data-royal-content>
         <div className="text-center mb-20">
           <div className="text-gold-dark font-display text-xs tracking-[0.5em] uppercase mb-4">Chapitre II</div>
           <h2 className="font-display text-4xl md:text-6xl text-[hsl(350_55%_18%)] leading-[1.05]">
@@ -391,15 +341,15 @@ const RoyalIndex = () => {
             Three residences, one lineage. Choose your chamber.
           </p>
         </div>
-        <div className="max-w-6xl mx-auto grid sm:grid-cols-2 lg:grid-cols-3 gap-16 sm:gap-12 lg:gap-8">
+        <div className="max-w-7xl mx-auto grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {hotels.map((h, i) => (
-            <RoyalHotelPortrait key={h.id} hotel={h} index={i} onClick={handleClick} onHover={handleHover} />
+            <RoyalHotelPortrait key={h.id} hotel={h} index={i} onClick={handleClick} />
           ))}
-        </div>
+        </div></div>
       </section>
 
       {/* ————— CHAPTER III : GRAND HALLS ————— */}
-      <section id="halls" className="relative py-32 sm:py-40 px-6 bg-[hsl(350_50%_14%)] text-gold overflow-hidden">
+      <section id="halls" data-royal-reveal className="relative py-32 sm:py-40 px-6 bg-[hsl(350_50%_14%)]/95 text-gold overflow-hidden">
         {/* baroque wallpaper pattern */}
         <div
           className="absolute inset-0 opacity-[0.06]"
@@ -409,7 +359,7 @@ const RoyalIndex = () => {
             backgroundSize: "80px 80px, 80px 80px",
           }}
         />
-        <div className="relative max-w-6xl mx-auto">
+        <div data-royal-content className="relative max-w-6xl mx-auto">
           <div className="text-center mb-20">
             <div className="font-display text-xs tracking-[0.5em] uppercase mb-4 opacity-80">Chapitre III</div>
             <h2 className="font-display text-4xl md:text-6xl leading-[1.05]">
@@ -446,8 +396,8 @@ const RoyalIndex = () => {
       </section>
 
       {/* ————— CHAPTER IV : CORRESPONDENCE ————— */}
-      <section id="correspondence" className="relative py-32 sm:py-40 px-6 bg-[hsl(40_40%_94%)]">
-        <div className="max-w-4xl mx-auto text-center">
+      <section id="correspondence" data-royal-reveal className="relative py-32 sm:py-40 px-6 bg-[hsl(40_40%_94%)]/90">
+        <div data-royal-content className="max-w-4xl mx-auto text-center">
           <div className="text-gold-dark font-display text-xs tracking-[0.5em] uppercase mb-4">Chapitre IV</div>
           <h2 className="font-display text-4xl md:text-6xl text-[hsl(350_55%_18%)] leading-[1.05]">
             <span className="italic">By Royal</span> Correspondence
@@ -493,17 +443,6 @@ const RoyalIndex = () => {
         </div>
       </footer>
 
-      {/* Transitions */}
-      <HotelZoomTransition
-        isActive={zoomActive} targetImage={zoomImage} cardRect={zoomRect}
-        onMidpoint={() => { if (pendingPath) navigate(pendingPath); }}
-        onComplete={() => setZoomActive(false)}
-      />
-      <EvaraGifTransition
-        isActive={transitionActive} scope={transitionScope}
-        onMidpoint={() => { if (pendingPath) navigate(pendingPath); }}
-        onComplete={() => setTransitionActive(false)}
-      />
     </div>
   );
 };

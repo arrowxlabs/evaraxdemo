@@ -3,13 +3,11 @@ import { motion, AnimatePresence, useInView } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { hotels } from "@/data/hotels";
 import { Phone, Mail, Instagram, Menu, X, ArrowRight } from "lucide-react";
-import HotelZoomTransition from "@/components/HotelZoomTransition";
-import EvaraGifTransition from "@/components/EvaraGifTransition";
 import LuxuryOrnament from "@/components/LuxuryOrnament";
 import { useMediaUrl } from "@/hooks/useHotelMedia";
 
 // Staggered card component with scroll-triggered animation
-const HotelCard = ({ hotel, index, onClickHotel, onHoverHotel }: { hotel: typeof hotels[0]; index: number; onClickHotel: (hotel: typeof hotels[0], rect: DOMRect) => void; onHoverHotel: (hotelId: string) => void }) => {
+const HotelCard = ({ hotel, index, onClickHotel }: { hotel: typeof hotels[0]; index: number; onClickHotel: (hotel: typeof hotels[0]) => void }) => {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-80px" });
   const cardImage = useMediaUrl(hotel.id, "homepage-card", hotel.cardImage);
@@ -23,15 +21,7 @@ const HotelCard = ({ hotel, index, onClickHotel, onHoverHotel }: { hotel: typeof
       initial={{ opacity: 0, y: 60 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.8, delay: index * 0.15, ease: [0.25, 0.1, 0.25, 1] }}
-      onMouseEnter={() => onHoverHotel(hotel.id)}
-      onTouchStart={() => onHoverHotel(hotel.id)}
-      onClick={() => {
-        if (ref.current) {
-          const imgEl = ref.current.querySelector("img");
-          const rect = imgEl?.getBoundingClientRect() || ref.current.getBoundingClientRect();
-          onClickHotel(hotel, rect);
-        }
-      }}
+      onClick={() => onClickHotel(hotel)}
     >
       {/* Image shown directly on background — no box/shadow/border */}
       <div className="relative mb-5 md:mb-6">
@@ -79,43 +69,6 @@ const Index = () => {
   const [introPhase, setIntroPhase] = useState(0);
   const [scrolled, setScrolled] = useState(false);
 
-  // Zoom transition state
-  const [zoomActive, setZoomActive] = useState(false);
-  const [zoomImage, setZoomImage] = useState<string | undefined>();
-  const [zoomRect, setZoomRect] = useState<DOMRect | null>(null);
-  const [pendingPath, setPendingPath] = useState<string | null>(null);
-
-  // Cinematic GIF/video transition (fires for Hotel Evara + any hotel with a custom transition video)
-  const [evaraTransitionActive, setEvaraTransitionActive] = useState(false);
-  const [transitionScope, setTransitionScope] = useState<string>("__global__");
-
-  // Preload the transition video + audio once so playback is instant on click.
-  // Kept on a ref so the browser doesn't drop the warmed cache before use.
-  const preloadRef = useRef<HTMLVideoElement | null>(null);
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      const { fetchTransitionVideo } = await import("@/hooks/useTransitionVideo");
-      const transition = await fetchTransitionVideo();
-      if (cancelled) return;
-      const supportsWebm = document.createElement("video").canPlayType("video/webm");
-      const v = document.createElement("video");
-      v.preload = "auto";
-      v.muted = true;
-      (v as HTMLVideoElement & { playsInline: boolean }).playsInline = true;
-      v.src = transition.isCustom
-        ? transition.mp4Url
-        : supportsWebm
-        ? "/transitions/evara-transition-fast.webm"
-        : transition.mp4Url;
-      v.load();
-      preloadRef.current = v;
-      const a = new Audio("/transitions/evara-chime.m4a");
-      a.preload = "auto";
-    })();
-    return () => { cancelled = true; };
-  }, []);
-
 
 
   useEffect(() => {
@@ -146,101 +99,13 @@ const Index = () => {
     return () => timers.forEach(clearTimeout);
   }, []);
 
-  const handleClickHotel = useCallback(async (hotel: typeof hotels[0], rect: DOMRect) => {
-    setPendingPath(`/hotel/${hotel.id}`);
-
-    // Hotel Evara → always uses the cinematic transition.
-    // Other hotels → use the cinematic transition when a per-hotel video
-    // has been uploaded in the admin; otherwise fall back to the zoom.
-    if (hotel.id === "evara") {
-      setTransitionScope(hotel.id);
-      setEvaraTransitionActive(true);
-      return;
-    }
-
-    try {
-      const { fetchTransitionVideo } = await import("@/hooks/useTransitionVideo");
-      const perHotel = await fetchTransitionVideo(hotel.id);
-      if (perHotel.isCustom && perHotel.scope === hotel.id) {
-        setTransitionScope(hotel.id);
-        setEvaraTransitionActive(true);
-        return;
-      }
-    } catch {
-      /* fall through to zoom */
-    }
-
-    setZoomImage(hotel.cardImage);
-    setZoomRect(rect);
-    setZoomActive(true);
-  }, []);
-
-  // Warm each hotel's transition video on hover/touch so click plays instantly.
-  const warmedRef = useRef<Set<string>>(new Set());
-  const handleHoverHotel = useCallback(async (hotelId: string) => {
-    if (warmedRef.current.has(hotelId)) return;
-    warmedRef.current.add(hotelId);
-    try {
-      const { fetchTransitionVideo } = await import("@/hooks/useTransitionVideo");
-      const t = await fetchTransitionVideo(hotelId);
-      // Background HTTP-cache warm — non-blocking, low priority.
-      fetch(t.mp4Url, { cache: "force-cache", priority: "low" as RequestPriority }).catch(() => {});
-      // Also load metadata into a hidden video so playback starts instant.
-      const v = document.createElement("video");
-      v.preload = "auto";
-      v.muted = true;
-      (v as HTMLVideoElement & { playsInline: boolean }).playsInline = true;
-      v.src = t.mp4Url;
-      v.load();
-    } catch {
-      /* noop */
-    }
-  }, []);
-
-
-  const handleEvaraMidpoint = useCallback(() => {
-    if (pendingPath) {
-      navigate(pendingPath);
-      window.scrollTo(0, 0);
-    }
-  }, [navigate, pendingPath]);
-
-  const handleEvaraComplete = useCallback(() => {
-    setEvaraTransitionActive(false);
-    setPendingPath(null);
-  }, []);
-
-  const handleZoomMidpoint = useCallback(() => {
-    if (pendingPath) {
-      navigate(pendingPath);
-      window.scrollTo(0, 0);
-    }
-  }, [navigate, pendingPath]);
-
-  const handleZoomComplete = useCallback(() => {
-    setZoomActive(false);
-    setPendingPath(null);
-    setZoomImage(undefined);
-    setZoomRect(null);
-  }, []);
+  const handleClickHotel = useCallback((hotel: typeof hotels[0]) => {
+    navigate(`/hotel/${hotel.id}`);
+    window.scrollTo(0, 0);
+  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-background text-foreground font-body overflow-x-hidden">
-      <HotelZoomTransition
-        isActive={zoomActive}
-        targetImage={zoomImage}
-        cardRect={zoomRect}
-        onMidpoint={handleZoomMidpoint}
-        onComplete={handleZoomComplete}
-      />
-
-      <EvaraGifTransition
-        isActive={evaraTransitionActive}
-        scope={transitionScope}
-        onMidpoint={handleEvaraMidpoint}
-        onComplete={handleEvaraComplete}
-      />
-
       {/* ===== INTRO LOADER ===== */}
       <AnimatePresence mode="wait">
         {!introComplete && (
@@ -544,7 +409,6 @@ const Index = () => {
               hotel={hotel}
               index={index}
               onClickHotel={handleClickHotel}
-              onHoverHotel={handleHoverHotel}
             />
           ))}
         </div>

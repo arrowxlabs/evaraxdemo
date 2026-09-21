@@ -12,6 +12,7 @@ import {
   RoyalDivider,
   Chandelier,
 } from "@/components/royal/RoyalCrest";
+import { RoyalAtmosphere, useRoyalSectionReveals } from "@/components/royal/RoyalAtmosphere";
 
 const roman = (n: number) => ["I","II","III","IV","V","VI","VII","VIII","IX","X"][n] || String(n+1);
 
@@ -173,6 +174,7 @@ const HighlightRoyal = ({ h, hotelId, index, onOpen }: { h: typeof hotels[0]["hi
 const RoyalHotelPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const revealScope = useRoyalSectionReveals();
   const hotel = hotels.find(h => h.id === id);
   const [scrolled, setScrolled] = useState(false);
 
@@ -192,7 +194,8 @@ const RoyalHotelPage = () => {
   }
 
   return (
-    <div className="relative text-foreground">
+    <div ref={revealScope} className="relative text-foreground royal-cinematic-page">
+      <RoyalAtmosphere />
       {/* Top ribbon */}
       <header className={`fixed top-0 inset-x-0 z-40 transition-all duration-500 ${scrolled ? "bg-background/95 backdrop-blur-md border-b border-gold/30" : "bg-transparent"}`}>
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
@@ -207,8 +210,8 @@ const RoyalHotelPage = () => {
       <RoyalHero hotel={hotel} />
 
       {/* ————— CHAPTER I : PROLOGUE ————— */}
-      <section className="relative py-32 px-6 bg-[hsl(40_40%_94%)]">
-        <Chapter n={0} title="The Prologue" subtitle="A letter from the master of the house." />
+      <section data-royal-reveal className="relative py-32 px-6 bg-[hsl(40_40%_94%)]/90">
+        <div data-royal-content><Chapter n={0} title="The Prologue" subtitle="A letter from the master of the house." />
         <div className="max-w-3xl mx-auto text-center">
           <WaxSeal className="w-14 h-14 mx-auto mb-8" />
           <p className="font-display italic text-xl md:text-2xl leading-[1.7] text-[hsl(350_55%_18%)]">
@@ -217,22 +220,22 @@ const RoyalHotelPage = () => {
           <div className="mt-10 flex items-center justify-center gap-3 text-gold-dark text-[10px] tracking-[0.4em] uppercase font-display">
             <MapPin className="w-3 h-3" /> {hotel.address}
           </div>
-        </div>
+        </div></div>
       </section>
 
       {/* ————— CHAPTER II : CHAMBERS ————— */}
-      <section className="relative py-32 px-6 bg-[hsl(40_35%_90%)] overflow-hidden">
-        <Chapter n={1} title="The Chambers" subtitle="Suites shaped by centuries of grace." />
+      <section data-royal-reveal className="relative py-32 px-6 bg-[hsl(40_35%_90%)]/90 overflow-hidden">
+        <div data-royal-content><Chapter n={1} title="The Chambers" subtitle="Suites shaped by centuries of grace." />
         <div className="max-w-6xl mx-auto space-y-32">
           {hotel.rooms.map((r, i) => (
             <RoomCard key={r.key} room={r} hotelId={hotel.id} index={i} />
           ))}
-        </div>
+        </div></div>
       </section>
 
       {/* ————— CHAPTER III : COURTLY LIFE (highlights) ————— */}
       {hotel.highlights.length > 0 && (
-        <section className="relative py-32 px-6 bg-[hsl(350_50%_14%)] text-gold overflow-hidden">
+        <section data-royal-reveal className="relative py-32 px-6 bg-[hsl(350_50%_14%)]/95 text-gold overflow-hidden">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 opacity-30 hidden md:block">
             <Chandelier className="w-32 h-40" />
           </div>
@@ -243,7 +246,7 @@ const RoyalHotelPage = () => {
               backgroundSize: "80px 80px",
             }}
           />
-          <div className="relative">
+          <div data-royal-content className="relative">
             <div className="text-center mb-16">
               <div className="font-display text-xs tracking-[0.5em] uppercase mb-4 opacity-80">Chapitre {roman(2)}</div>
               <h2 className="font-display text-3xl md:text-5xl">
@@ -264,8 +267,8 @@ const RoyalHotelPage = () => {
       )}
 
       {/* ————— CHAPTER IV : COURT AMENITIES ————— */}
-      <section className="relative py-32 px-6 bg-[hsl(40_45%_94%)]">
-        <Chapter n={3} title="The Amenities" subtitle="Services rendered as of old." />
+      <section data-royal-reveal className="relative py-32 px-6 bg-[hsl(40_45%_94%)]/90">
+        <div data-royal-content><Chapter n={3} title="The Amenities" subtitle="Services rendered as of old." />
         <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6">
           {hotel.amenities.slice(0, 12).map((a, i) => (
             <motion.div
@@ -279,12 +282,12 @@ const RoyalHotelPage = () => {
               <div className="font-display text-xs tracking-[0.2em] uppercase text-[hsl(350_55%_18%)]">{a}</div>
             </motion.div>
           ))}
-        </div>
+        </div></div>
       </section>
 
       {/* ————— CHAPTER V : CORRESPONDENCE ————— */}
-      <section className="relative py-32 px-6 bg-[hsl(350_50%_14%)] text-gold overflow-hidden">
-        <div className="max-w-3xl mx-auto text-center">
+      <section data-royal-reveal className="relative py-32 px-6 bg-[hsl(350_50%_14%)]/95 text-gold overflow-hidden">
+        <div data-royal-content className="max-w-3xl mx-auto text-center">
           <div className="font-display text-xs tracking-[0.5em] uppercase mb-4 opacity-80">Chapitre {roman(4)}</div>
           <h2 className="font-display text-3xl md:text-5xl">
             <span className="italic font-light">By Royal</span> Invitation

@@ -64,17 +64,21 @@ function HotelEditorialRow({
           >
             <ArrowRight aria-hidden />
           </Button>
-          <button className="hotel-editorial-link" type="button" onClick={() => onClickHotel(hotel)}>
+          <Button className="hotel-editorial-link" type="button" variant="link" onClick={() => onClickHotel(hotel)}>
             {hotel.id === "evara-exotica" ? "Coming soon" : "Explore hotel"}
-          </button>
+          </Button>
           <i aria-hidden />
         </div>
       </motion.div>
 
-      <motion.button
-        type="button"
+      <motion.div
+        role="button"
+        tabIndex={0}
         className="hotel-editorial-media"
         onClick={() => onClickHotel(hotel)}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") onClickHotel(hotel);
+        }}
         aria-label={`Open ${copy.name}`}
         initial={{ clipPath: reverse ? "polygon(0 0, 0 0, 0 100%, 0 100%)" : "polygon(100% 0, 100% 0, 100% 100%, 100% 100%)" }}
         animate={inView ? {
@@ -93,7 +97,7 @@ function HotelEditorialRow({
           style={{ y: imageY }}
         />
         <span className="hotel-editorial-sheen" aria-hidden />
-      </motion.button>
+      </motion.div>
     </motion.article>
   );
 }

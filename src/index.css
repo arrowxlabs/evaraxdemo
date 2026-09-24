@@ -1,46 +1,44 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=Cinzel:wght@400;500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    /* Ivory / warm-white base — luxury forest theme */
-    --background: 42 30% 97%;
-    --foreground: 145 22% 12%;
+    /* Ivory, forest glass and bronze — futuristic hospitality */
+    --background: 50 33% 97%;
+    --foreground: 157 28% 20%;
 
-    --card: 42 24% 96%;
-    --card-foreground: 145 22% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 157 28% 20%;
 
     --popover: 42 30% 97%;
     --popover-foreground: 145 22% 12%;
 
     /* Deep forest green as primary */
-    --primary: 148 34% 18%;
-    --primary-foreground: 42 30% 97%;
+    --primary: 157 28% 26%;
+    --primary-foreground: 50 33% 97%;
 
-    --secondary: 90 12% 92%;
+    --secondary: 131 16% 88%;
     --secondary-foreground: 145 22% 12%;
 
-    --muted: 90 10% 90%;
-    --muted-foreground: 145 8% 38%;
+    --muted: 130 14% 91%;
+    --muted-foreground: 155 10% 43%;
 
     /* Warm bronze accent */
-    --accent: 36 42% 44%;
+    --accent: 38 37% 51%;
     --accent-foreground: 42 30% 97%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 90 10% 86%;
-    --input: 90 10% 86%;
-    --ring: 148 34% 18%;
+    --border: 140 12% 84%;
+    --input: 140 12% 84%;
+    --ring: 157 28% 26%;
 
     --radius: 0.5rem;
 
     /* Bronze / gold accent scale (kept "gold-*" names for compatibility) */
-    --gold: 36 42% 44%;
+    --gold: 38 37% 51%;
     --gold-light: 38 46% 60%;
     --gold-dark: 32 48% 28%;
     --cream: 42 30% 97%;
@@ -48,15 +46,15 @@
     --charcoal: 145 22% 12%;
     --charcoal-light: 145 14% 22%;
     /* Forest greens */
-    --forest: 148 34% 18%;
-    --forest-deep: 152 40% 12%;
-    --forest-mid: 146 24% 30%;
+    --forest: 157 28% 26%;
+    --forest-deep: 158 32% 16%;
+    --forest-mid: 153 20% 38%;
     --moss: 100 18% 42%;
     --moss-light: 96 20% 62%;
     --olive: 82 22% 30%;
     --olive-light: 82 18% 42%;
 
-    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-display: 'Space Grotesk', system-ui, sans-serif;
     --font-body: 'DM Sans', system-ui, sans-serif;
 
     --sidebar-background: 42 24% 95%;
@@ -80,18 +78,18 @@
     font-weight: 300;
     font-size: 15px;
     line-height: 1.65;
-    letter-spacing: 0.005em;
+    letter-spacing: 0;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
-    font-weight: 300;
-    letter-spacing: 0.005em;
+    font-weight: 500;
+    letter-spacing: 0;
     color: hsl(var(--foreground));
   }
-  h1 { font-size: clamp(2.4rem, 6vw, 4.25rem); line-height: 1.06; letter-spacing: -0.005em; }
+  h1 { font-size: clamp(2.4rem, 6vw, 4.25rem); line-height: 1.06; letter-spacing: 0; }
   h2 { font-size: clamp(1.75rem, 4.2vw, 2.85rem); line-height: 1.12; }
   h3 { font-size: clamp(1.3rem, 2.6vw, 1.75rem); line-height: 1.22; }
   h4 { font-size: clamp(1.05rem, 1.8vw, 1.25rem); line-height: 1.35; }

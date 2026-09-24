@@ -88,14 +88,21 @@ function HotelEditorialRow({
         } : {}}
         transition={{ duration: 1.05, delay: 0.08 + index * 0.08, ease: [0.76, 0, 0.24, 1] }}
       >
-        <motion.img
-          src={imageFailed ? hotel.cardImage : mediaUrl}
-          alt={copy.name}
-          onError={() => setImageFailed(true)}
-          loading={index === 0 ? "eager" : "lazy"}
-          decoding="async"
-          style={{ y: imageY }}
-        />
+        {!imageFailed ? (
+          <motion.img
+            src={mediaUrl}
+            alt={copy.name}
+            onError={() => setImageFailed(true)}
+            loading={index === 0 ? "eager" : "lazy"}
+            decoding="async"
+            style={{ y: imageY }}
+          />
+        ) : (
+          <div className="hotel-editorial-placeholder" aria-label={`${copy.name} image unavailable`}>
+            <span aria-hidden>E</span>
+            <small>{copy.name}</small>
+          </div>
+        )}
         <span className="hotel-editorial-sheen" aria-hidden />
       </motion.div>
     </motion.article>

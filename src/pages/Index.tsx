@@ -6,6 +6,7 @@ import { Phone, Mail, Instagram, Menu, X, ArrowRight } from "lucide-react";
 import LuxuryOrnament from "@/components/LuxuryOrnament";
 import { useMediaUrl } from "@/hooks/useHotelMedia";
 import HotelShowcase from "@/components/home/HotelShowcase";
+import StayMatcher from "@/components/home/StayMatcher";
 
 // Staggered card component with scroll-triggered animation
 const HotelCard = ({ hotel, index, onClickHotel }: { hotel: typeof hotels[0]; index: number; onClickHotel: (hotel: typeof hotels[0]) => void }) => {
@@ -386,6 +387,7 @@ const Index = () => {
       {/* ===== PROPERTIES SECTION — futuristic luxury showcase ===== */}
       <main>
         <HotelShowcase onClickHotel={handleClickHotel} />
+        <StayMatcher />
       </main>
 
       {/* ===== LUXURY FOOTER ===== */}

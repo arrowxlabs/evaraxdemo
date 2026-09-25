@@ -5,6 +5,7 @@ import { hotels } from "@/data/hotels";
 import { ArrowUpRight, Menu, X, Phone, Mail, Instagram } from "lucide-react";
 import { useMediaUrl } from "@/hooks/useHotelMedia";
 import { RoyalAtmosphere, useRoyalSectionReveals } from "@/components/royal/RoyalAtmosphere";
+import StayMatcher from "@/components/home/StayMatcher";
 import {
   RoyalCrown,
   FleurDeLis,
@@ -347,6 +348,8 @@ const RoyalIndex = () => {
           ))}
         </div></div>
       </section>
+
+      <StayMatcher />
 
       {/* ————— CHAPTER III : GRAND HALLS ————— */}
       <section id="halls" data-royal-reveal className="relative py-32 sm:py-40 px-6 bg-[hsl(350_50%_14%)]/95 text-gold overflow-hidden">

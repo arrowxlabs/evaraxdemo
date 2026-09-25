@@ -1,0 +1,3 @@
+- Keep hotel catalog facts in `src/data/hotels.ts` and pass a bounded snapshot to recommendation functions, so the model cannot invent properties.
+- Keep AI Gateway calls in `supabase/functions/stay-match` with shared Responses helpers, so the private key never enters the browser.
+- Present the stay matcher on both homepage variants as a reusable section, so the Forest and Royal journeys share one workflow.

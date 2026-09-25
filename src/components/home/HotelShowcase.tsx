@@ -29,6 +29,8 @@ function HotelEditorialRow({
   const imageY = useTransform(scrollYProgress, [0, 1], reducedMotion ? [0, 0] : [18, -18]);
   const mediaUrl = useMediaUrl(hotel.id, "homepage-card", hotel.cardImage);
   const [imageFailed, setImageFailed] = useState(false);
+  const [fallbackFailed, setFallbackFailed] = useState(false);
+  const imageSrc = imageFailed && mediaUrl !== hotel.cardImage ? hotel.cardImage : mediaUrl;
   const copy = presentation[index] ?? { name: hotel.name, tagline: hotel.tagline };
   const reverse = index % 2 === 1;
 
@@ -88,13 +90,15 @@ function HotelEditorialRow({
         } : {}}
         transition={{ duration: 1.05, delay: 0.08 + index * 0.08, ease: [0.76, 0, 0.24, 1] }}
       >
-        {!imageFailed ? (
+        {!fallbackFailed ? (
           <motion.img
-            src={mediaUrl}
+            src={imageSrc}
             alt={copy.name}
-            onError={() => setImageFailed(true)}
+            onError={() => imageSrc === hotel.cardImage ? setFallbackFailed(true) : setImageFailed(true)}
             loading={index === 0 ? "eager" : "lazy"}
             decoding="async"
+            fetchPriority={index === 0 ? "high" : "auto"}
+            sizes="(max-width: 700px) 56vw, (max-width: 1024px) 52vw, 60vw"
             style={{ y: imageY }}
           />
         ) : (

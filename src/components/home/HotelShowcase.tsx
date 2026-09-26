@@ -4,6 +4,7 @@ import { ArrowRight, MapPin } from "lucide-react";
 import { hotels } from "@/data/hotels";
 import { useMediaUrl } from "@/hooks/useHotelMedia";
 import { Button } from "@/components/ui/button";
+import evaraFallback from "@/assets/hotel-evara.jpg";
 
 type Hotel = (typeof hotels)[number];
 
@@ -30,7 +31,8 @@ function HotelEditorialRow({
   const mediaUrl = useMediaUrl(hotel.id, "homepage-card", hotel.cardImage);
   const [imageFailed, setImageFailed] = useState(false);
   const [fallbackFailed, setFallbackFailed] = useState(false);
-  const imageSrc = imageFailed && mediaUrl !== hotel.cardImage ? hotel.cardImage : mediaUrl;
+  const localFallback = hotel.id === "evara" ? evaraFallback : hotel.cardImage;
+  const imageSrc = imageFailed && mediaUrl !== localFallback ? localFallback : mediaUrl;
   const copy = presentation[index] ?? { name: hotel.name, tagline: hotel.tagline };
   const reverse = index % 2 === 1;
 
@@ -54,7 +56,7 @@ function HotelEditorialRow({
         </div>
         <h3>{copy.name}</h3>
         <p className="hotel-editorial-tagline">{copy.tagline}</p>
-        <p className="hotel-editorial-location"><MapPin aria-hidden /> Darbhanga, Bihar</p>
+        <p className="hotel-editorial-location"><MapPin aria-hidden /> {hotel.id === "evara-exotica" ? "Location to be announced" : "Darbhanga, Bihar"}</p>
         <div className="hotel-editorial-action">
           <Button
             type="button"
@@ -94,7 +96,7 @@ function HotelEditorialRow({
           <motion.img
             src={imageSrc}
             alt={copy.name}
-            onError={() => imageSrc === hotel.cardImage ? setFallbackFailed(true) : setImageFailed(true)}
+            onError={() => imageSrc === localFallback ? setFallbackFailed(true) : setImageFailed(true)}
             loading={index === 0 ? "eager" : "lazy"}
             decoding="async"
             fetchPriority={index === 0 ? "high" : "auto"}

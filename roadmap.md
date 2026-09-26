@@ -1,3 +1,3 @@
-- [ ] Refine hotel showcase across desktop, tablet and mobile without changing mobile alternating layout.
-- [ ] Add destination/date/budget/preference stay matcher backed by AI Gateway.
-- [ ] Verify recommendation request and responsive layouts.
+- [x] Refine hotel showcase across desktop, tablet and mobile without changing mobile alternating layout.
+- [x] Add destination/date/budget/preference stay matcher backed by AI Gateway.
+- [x] Verify recommendation request and responsive layouts.

@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { hotels } from "@/data/hotels";
-import { supabase } from "@/integrations/supabase/client";
 
 type Match = { id: string; why: string; room: string | null; priceNote: string | null };
 type Recommendation = { intro: string; matches: Match[]; note: string };
@@ -35,6 +34,12 @@ export default function StayMatcher() {
       if (!response.ok) {
         const body = await response.json().catch(() => ({}));
         throw new Error(body.message || "Recommendations are unavailable right now.");
+      }
+      const contentType = response.headers.get("content-type") || "";
+      if (contentType.includes("application/json")) {
+        const data = await response.json();
+        setResult(data);
+        return;
       }
       if (!response.body) throw new Error("Recommendations are unavailable right now.");
       const reader = response.body.getReader();
